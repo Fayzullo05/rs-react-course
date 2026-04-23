@@ -1,0 +1,19 @@
+.container {
+  background: #ffffff;
+  padding: 20px;
+  border: 1px solid #5048e9;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+}
+
+.title {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
