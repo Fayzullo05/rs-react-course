@@ -1,6 +1,7 @@
 export type Person = {
+  id: number;
   name: string;
+  status: string;
+  species: string;
   gender: string;
-  birth_year: string;
-  height: string;
 };

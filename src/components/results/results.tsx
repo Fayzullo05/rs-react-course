@@ -26,7 +26,7 @@ class Results extends Component<Props> {
         {!loading && !error && results.length > 0 && (
           <div className={styles.list}>
             {results.map((person) => (
-              <Card key={person.name} person={person} />
+              <Card key={person.id} person={person} />
             ))}
           </div>
         )}

@@ -15,12 +15,9 @@ class Card extends Component<Props> {
         <div className={styles.title}>{person.name}</div>
 
         <div className={styles.info}>
+          <span>Status: {person.status}</span>
+          <span>Species: {person.species}</span>
           <span>Gender: {person.gender}</span>
-          <span>Birth: {person.birth_year}</span>
-          <span>
-            Height:{' '}
-            {person.height !== 'unknown' ? `${person.height} cm` : 'Unknown'}
-          </span>
         </div>
       </div>
     );
