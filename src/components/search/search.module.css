@@ -1,9 +1,9 @@
 .container {
   background: #ffffff;
   padding: 20px;
-  border: 1px solid #5048e9;
   border-radius: 10px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  margin-top: 16px;
 }
 
 .title {
@@ -41,4 +41,9 @@
 
 .button:hover {
   background-color: #382dae;
+}
+
+.button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
 }

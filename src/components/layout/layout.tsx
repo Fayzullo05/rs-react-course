@@ -1,32 +1,67 @@
 import { Component } from 'react';
 import Search from '../search/search';
 import Results from '../results/results';
+import type { Person } from '../../types/person';
 import styles from './layout.module.css';
 
 type State = {
   searchTerm: string;
+  results: Person[];
+  loading: boolean;
+  error: string | null;
 };
 
 class Layout extends Component<object, State> {
   state: State = {
     searchTerm: '',
+    results: [],
+    loading: false,
+    error: null,
   };
 
   componentDidMount() {
-    const saved = localStorage.getItem('searchTerm');
-
-    if (saved) {
-      this.setState({ searchTerm: saved });
-    }
+    const saved = localStorage.getItem('searchTerm') || '';
+    this.setState({ searchTerm: saved }, () => {
+      this.fetchData(saved);
+    });
   }
+
+  fetchData = async (term: string) => {
+    this.setState({ loading: true, error: null });
+
+    try {
+      const url = term
+        ? `https://swapi.dev/api/people/?search=${term}`
+        : `https://swapi.dev/api/people/`;
+
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await res.json();
+
+      this.setState({
+        results: data.results || [],
+        loading: false,
+      });
+    } catch {
+      this.setState({
+        error: 'Something went wrong',
+        loading: false,
+      });
+    }
+  };
 
   handleSearch = (value: string) => {
     const trimmed = value.trim();
 
     if (trimmed === this.state.searchTerm) return;
 
-    this.setState({ searchTerm: trimmed });
     localStorage.setItem('searchTerm', trimmed);
+
+    this.setState({ searchTerm: trimmed }, () => this.fetchData(trimmed));
   };
 
   render() {
@@ -34,7 +69,11 @@ class Layout extends Component<object, State> {
       <div className={styles.wrapper}>
         <Search value={this.state.searchTerm} onSearch={this.handleSearch} />
 
-        <Results searchTerm={this.state.searchTerm} />
+        <Results
+          results={this.state.results}
+          loading={this.state.loading}
+          error={this.state.error}
+        />
       </div>
     );
   }
