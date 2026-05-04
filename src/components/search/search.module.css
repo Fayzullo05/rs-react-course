@@ -42,8 +42,3 @@
 .button:hover {
   background-color: #382dae;
 }
-
-.button:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
-}

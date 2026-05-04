@@ -38,7 +38,6 @@ class Search extends Component<Props, State> {
 
   render() {
     const { inputValue } = this.state;
-    const isDisabled = !inputValue.trim();
 
     return (
       <div className={styles.container}>
@@ -54,11 +53,7 @@ class Search extends Component<Props, State> {
             onKeyDown={this.handleKeyDown}
           />
 
-          <button
-            className={styles.button}
-            onClick={this.handleSearch}
-            disabled={isDisabled}
-          >
+          <button className={styles.button} onClick={this.handleSearch}>
             Search
           </button>
         </div>
