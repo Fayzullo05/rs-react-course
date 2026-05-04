@@ -2,6 +2,7 @@ import { Component } from 'react';
 import Search from '../search/search';
 import Results from '../results/results';
 import type { Person } from '../../types/person';
+import ErrorButton from '../errorButton/errorButton';
 import styles from './layout.module.css';
 
 type State = {
@@ -9,6 +10,10 @@ type State = {
   results: Person[];
   loading: boolean;
   error: string | null;
+};
+
+type PeopleResponse = {
+  results: Person[];
 };
 
 class Layout extends Component<object, State> {
@@ -21,6 +26,7 @@ class Layout extends Component<object, State> {
 
   componentDidMount() {
     const saved = localStorage.getItem('searchTerm') || '';
+
     this.setState({ searchTerm: saved }, () => {
       this.fetchData(saved);
     });
@@ -31,24 +37,36 @@ class Layout extends Component<object, State> {
 
     try {
       const url = term
-        ? `https://swapi.dev/api/people/?search=${term}`
-        : `https://swapi.dev/api/people/`;
+        ? `https://rickandmortyapi.com/api/character/?name=${encodeURIComponent(
+            term
+          )}`
+        : 'https://rickandmortyapi.com/api/character/';
 
       const res = await fetch(url);
+
+      if (res.status === 404) {
+        this.setState({
+          results: [],
+          loading: false,
+        });
+        return;
+      }
 
       if (!res.ok) {
         throw new Error('Failed to fetch data');
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as PeopleResponse;
 
       this.setState({
-        results: data.results || [],
+        results: data.results,
         loading: false,
       });
     } catch {
       this.setState({
-        error: 'Something went wrong',
+        results: [],
+        error:
+          'Failed to load results. Please check your connection or try again later.',
         loading: false,
       });
     }
@@ -74,6 +92,8 @@ class Layout extends Component<object, State> {
           loading={this.state.loading}
           error={this.state.error}
         />
+
+        <ErrorButton />
       </div>
     );
   }
