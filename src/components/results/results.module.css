@@ -19,3 +19,17 @@
   max-height: 500px;
   overflow-y: auto;
 }
+
+.error {
+  color: #de1f1f;
+  padding: 16px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.empty {
+  color: #6b6680;
+  padding: 16px;
+  text-align: center;
+  font-size: 16px;
+}
