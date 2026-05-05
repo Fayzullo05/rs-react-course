@@ -1,0 +1,35 @@
+.container {
+  background: #ffffff;
+  padding: 20px;
+  border: 1px solid #5048e9;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+}
+
+.title {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.error {
+  color: #de1f1f;
+  padding: 16px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.empty {
+  color: #6b6680;
+  padding: 16px;
+  text-align: center;
+  font-size: 16px;
+}

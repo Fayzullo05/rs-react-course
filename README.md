@@ -1,3 +1,1 @@
-# RS React Course
-
-First task – class components, search app.
+# React + TypeScript + Vite

@@ -1,0 +1,20 @@
+.card {
+  padding: 12px;
+  border-radius: 10px;
+  background: #f8f8ff;
+  border: 1px solid #e2e0ff;
+}
+
+.title {
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.info {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  color: #5f5a75;
+  font-size: 14px;
+}
