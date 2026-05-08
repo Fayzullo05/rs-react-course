@@ -11,6 +11,7 @@
     "prepare": "husky",
     "format": "prettier --write .",
     "test": "vitest",
+    "test:run": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
