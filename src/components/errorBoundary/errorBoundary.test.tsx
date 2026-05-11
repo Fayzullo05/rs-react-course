@@ -6,7 +6,9 @@ import { Component, type ReactNode } from 'react';
 
 class BrokenComponent extends Component {
   render(): ReactNode {
-    throw new Error('Broken component error');
+    return (() => {
+      throw new Error('Broken component error');
+    })();
   }
 }
 
