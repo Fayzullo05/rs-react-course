@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import type { KeyboardEvent } from 'react';
+import { useState } from 'react';
+import type { ChangeEvent, KeyboardEvent } from 'react';
 import styles from './search.module.css';
 
 type Props = {
@@ -7,11 +7,33 @@ type Props = {
   onSearch: (value: string) => void;
 };
 
+type InputState = {
+  inputValue: string;
+  previousValue: string;
+};
+
 function Search({ value, onSearch }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [state, setState] = useState<InputState>({
+    inputValue: value,
+    previousValue: value,
+  });
+
+  if (state.previousValue !== value) {
+    setState({
+      inputValue: value,
+      previousValue: value,
+    });
+  }
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setState({
+      inputValue: e.target.value,
+      previousValue: value,
+    });
+  };
 
   const handleSearch = () => {
-    onSearch(inputRef.current?.value ?? '');
+    onSearch(state.inputValue);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -26,12 +48,11 @@ function Search({ value, onSearch }: Props) {
 
       <div className={styles.form}>
         <input
-          key={value}
-          ref={inputRef}
           className={styles.input}
           type="text"
           placeholder="Enter search term..."
-          defaultValue={value}
+          value={state.inputValue}
+          onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
 

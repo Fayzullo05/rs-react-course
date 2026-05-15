@@ -1,39 +1,26 @@
-import { Component } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Search from '../search/search';
 import Results from '../results/results';
 import type { Person } from '../../types/person';
 import ErrorButton from '../errorButton/errorButton';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 import styles from './layout.module.css';
-
-type State = {
-  searchTerm: string;
-  results: Person[];
-  loading: boolean;
-  error: string | null;
-};
 
 type PeopleResponse = {
   results: Person[];
 };
 
-class Layout extends Component<object, State> {
-  state: State = {
-    searchTerm: '',
-    results: [],
-    loading: false,
-    error: null,
-  };
+function Layout() {
+  const [searchTerm, setSearchTerm] = useLocalStorage('searchTerm');
+  const [results, setResults] = useState<Person[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  componentDidMount() {
-    const saved = localStorage.getItem('searchTerm') || '';
+  const fetchData = useCallback(async (term: string) => {
+    await Promise.resolve();
 
-    this.setState({ searchTerm: saved }, () => {
-      this.fetchData(saved);
-    });
-  }
-
-  fetchData = async (term: string) => {
-    this.setState({ loading: true, error: null });
+    setLoading(true);
+    setError(null);
 
     try {
       const url = term
@@ -45,10 +32,8 @@ class Layout extends Component<object, State> {
       const res = await fetch(url);
 
       if (res.status === 404) {
-        this.setState({
-          results: [],
-          loading: false,
-        });
+        setResults([]);
+        setLoading(false);
         return;
       }
 
@@ -58,45 +43,44 @@ class Layout extends Component<object, State> {
 
       const data = (await res.json()) as PeopleResponse;
 
-      this.setState({
-        results: data.results,
-        loading: false,
-      });
+      setResults(data.results);
+      setLoading(false);
     } catch {
-      this.setState({
-        results: [],
-        error:
-          'Failed to load results. Please check your connection or try again later.',
-        loading: false,
-      });
+      setResults([]);
+      setError(
+        'Failed to load results. Please check your connection or try again later.'
+      );
+      setLoading(false);
     }
-  };
+  }, []);
 
-  handleSearch = (value: string) => {
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void fetchData(searchTerm);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [fetchData, searchTerm]);
+
+  const handleSearch = (value: string) => {
     const trimmed = value.trim();
 
-    if (trimmed === this.state.searchTerm) return;
+    if (trimmed === searchTerm) return;
 
-    localStorage.setItem('searchTerm', trimmed);
-
-    this.setState({ searchTerm: trimmed }, () => this.fetchData(trimmed));
+    setSearchTerm(trimmed);
   };
 
-  render() {
-    return (
-      <div className={styles.wrapper}>
-        <Search value={this.state.searchTerm} onSearch={this.handleSearch} />
+  return (
+    <div className={styles.wrapper}>
+      <Search value={searchTerm} onSearch={handleSearch} />
 
-        <Results
-          results={this.state.results}
-          loading={this.state.loading}
-          error={this.state.error}
-        />
+      <Results results={results} loading={loading} error={error} />
 
-        <ErrorButton />
-      </div>
-    );
-  }
+      <ErrorButton />
+    </div>
+  );
 }
 
 export default Layout;

@@ -35,9 +35,11 @@ describe('Layout', () => {
   test('fetches initial data on mount', async () => {
     render(<Layout />);
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      'https://rickandmortyapi.com/api/character/'
-    );
+    await waitFor(() => {
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        'https://rickandmortyapi.com/api/character/'
+      );
+    });
 
     expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
   });
@@ -58,20 +60,15 @@ describe('Layout', () => {
     });
   });
 
-  test('shows loading state while data is being fetched', () => {
+  test('shows loading state while data is being fetched', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(
-        () =>
-          new Promise(() => {
-            // intentionally pending promise
-          })
-      )
+      vi.fn(() => new Promise(() => {}))
     );
 
     render(<Layout />);
 
-    expect(screen.getByText(/loading results/i)).toBeInTheDocument();
+    expect(await screen.findByText(/loading results/i)).toBeInTheDocument();
   });
 
   test('saves search term to localStorage and fetches searched data', async () => {
