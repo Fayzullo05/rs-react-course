@@ -1,0 +1,41 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 20px;
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 64px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.text {
+  margin: 0 0 16px;
+  color: #6b6680;
+  font-size: 20px;
+}
+
+.link {
+  color: #5048e9;
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.link:hover {
+  color: #382dae;
+  border-color: #382dae;
+}
+
+.link:focus-visible {
+  outline: 2px solid #5048e9;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
