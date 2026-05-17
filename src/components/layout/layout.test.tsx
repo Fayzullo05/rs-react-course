@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import Layout from './layout';
 
 const mockPeople = [
@@ -13,6 +14,14 @@ const mockPeople = [
   },
 ];
 
+const renderLayout = (initialRoute = '/') => {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <Layout />
+    </MemoryRouter>
+  );
+};
+
 describe('Layout', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -23,7 +32,12 @@ describe('Layout', () => {
       vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
-        json: async () => ({ results: mockPeople }),
+        json: async () => ({
+          info: {
+            pages: 3,
+          },
+          results: mockPeople,
+        }),
       })
     );
   });
@@ -33,11 +47,11 @@ describe('Layout', () => {
   });
 
   test('fetches initial data on mount', async () => {
-    render(<Layout />);
+    renderLayout();
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/'
+        'https://rickandmortyapi.com/api/character/?page=1'
       );
     });
 
@@ -47,7 +61,7 @@ describe('Layout', () => {
   test('reads saved search term from localStorage on mount', async () => {
     localStorage.setItem('searchTerm', 'morty');
 
-    render(<Layout />);
+    renderLayout();
 
     expect(screen.getByPlaceholderText(/enter search term/i)).toHaveValue(
       'morty'
@@ -55,7 +69,7 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?name=morty'
+        'https://rickandmortyapi.com/api/character/?page=1&name=morty'
       );
     });
   });
@@ -66,7 +80,7 @@ describe('Layout', () => {
       vi.fn(() => new Promise(() => {}))
     );
 
-    render(<Layout />);
+    renderLayout();
 
     expect(await screen.findByText(/loading results/i)).toBeInTheDocument();
   });
@@ -74,7 +88,7 @@ describe('Layout', () => {
   test('saves search term to localStorage and fetches searched data', async () => {
     const user = userEvent.setup();
 
-    render(<Layout />);
+    renderLayout();
 
     await screen.findByText('Rick Sanchez');
 
@@ -89,7 +103,7 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?name=morty'
+        'https://rickandmortyapi.com/api/character/?page=1&name=morty'
       );
     });
   });
@@ -97,7 +111,7 @@ describe('Layout', () => {
   test('trims search term before saving and fetching', async () => {
     const user = userEvent.setup();
 
-    render(<Layout />);
+    renderLayout();
 
     await screen.findByText('Rick Sanchez');
 
@@ -112,7 +126,7 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?name=rick'
+        'https://rickandmortyapi.com/api/character/?page=1&name=rick'
       );
     });
   });
@@ -122,7 +136,7 @@ describe('Layout', () => {
 
     localStorage.setItem('searchTerm', 'rick');
 
-    render(<Layout />);
+    renderLayout();
 
     await screen.findByText('Rick Sanchez');
 
@@ -145,7 +159,7 @@ describe('Layout', () => {
       })
     );
 
-    render(<Layout />);
+    renderLayout();
 
     expect(await screen.findByText(/no results found/i)).toBeInTheDocument();
   });
@@ -156,7 +170,7 @@ describe('Layout', () => {
       vi.fn().mockRejectedValue(new Error('Network error'))
     );
 
-    render(<Layout />);
+    renderLayout();
 
     expect(
       await screen.findByText(
@@ -175,12 +189,38 @@ describe('Layout', () => {
       })
     );
 
-    render(<Layout />);
+    renderLayout();
 
     expect(
       await screen.findByText(
         /failed to load results. please check your connection or try again later/i
       )
     ).toBeInTheDocument();
+  });
+
+  test('fetches data for page from URL', async () => {
+    renderLayout('/?page=2');
+
+    await waitFor(() => {
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        'https://rickandmortyapi.com/api/character/?page=2'
+      );
+    });
+  });
+
+  test('updates page when pagination button is clicked', async () => {
+    const user = userEvent.setup();
+
+    renderLayout();
+
+    await screen.findByText('Rick Sanchez');
+
+    await user.click(screen.getByRole('button', { name: '2' }));
+
+    await waitFor(() => {
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        'https://rickandmortyapi.com/api/character/?page=2'
+      );
+    });
   });
 });

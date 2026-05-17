@@ -1,15 +1,24 @@
-import { Link, Route, Routes } from 'react-router-dom';
+import { NavLink, Route, Routes } from 'react-router-dom';
 import ErrorBoundary from './components/errorBoundary/errorBoundary';
 import MainPage from './pages/main/mainPage';
 import AboutPage from './pages/about/aboutPage';
 import NotFoundPage from './pages/notFound/notFoundPage';
+import styles from './App.module.css';
 
 function App() {
+  const getNavLinkClassName = ({ isActive }: { isActive: boolean }) => {
+    return isActive ? `${styles.navLink} ${styles.active}` : styles.navLink;
+  };
+
   return (
     <ErrorBoundary>
-      <nav>
-        <Link to="/">Main</Link>
-        <Link to="/about">About</Link>
+      <nav className={styles.nav}>
+        <NavLink className={getNavLinkClassName} to="/">
+          Main
+        </NavLink>
+        <NavLink className={getNavLinkClassName} to="/about">
+          About
+        </NavLink>
       </nav>
 
       <Routes>

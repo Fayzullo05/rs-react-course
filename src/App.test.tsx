@@ -22,7 +22,12 @@ describe('App', () => {
       vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
-        json: async () => ({ results: mockPeople }),
+        json: async () => ({
+          info: {
+            pages: 3,
+          },
+          results: mockPeople,
+        }),
       })
     );
   });
