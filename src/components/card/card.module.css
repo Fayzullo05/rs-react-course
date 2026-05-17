@@ -1,8 +1,24 @@
 .card {
+  width: 100%;
   padding: 12px;
   border-radius: 10px;
   background: #f8f8ff;
   border: 1px solid #e2e0ff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card:hover {
+  border-color: #5048e9;
+  transform: translateY(-1px);
+}
+
+.card:focus-visible {
+  outline: 2px solid #5048e9;
+  outline-offset: 3px;
 }
 
 .title {

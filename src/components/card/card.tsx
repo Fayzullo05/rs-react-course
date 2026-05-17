@@ -3,11 +3,16 @@ import styles from './card.module.css';
 
 type Props = {
   person: Person;
+  onClick?: (personId: number) => void;
 };
 
-function Card({ person }: Props) {
+function Card({ person, onClick }: Props) {
   return (
-    <div className={styles.card}>
+    <button
+      className={styles.card}
+      type="button"
+      onClick={() => onClick?.(person.id)}
+    >
       <div className={styles.title}>{person.name}</div>
 
       <div className={styles.info}>
@@ -15,7 +20,7 @@ function Card({ person }: Props) {
         <span>Species: {person.species}</span>
         <span>Gender: {person.gender}</span>
       </div>
-    </div>
+    </button>
   );
 }
 

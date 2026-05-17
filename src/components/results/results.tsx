@@ -7,9 +7,10 @@ type Props = {
   results: Person[];
   loading: boolean;
   error: string | null;
+  onItemClick?: (personId: number) => void;
 };
 
-function Results({ results, loading, error }: Props) {
+function Results({ results, loading, error, onItemClick }: Props) {
   return (
     <div className={styles.container}>
       <div className={styles.title}>Results</div>
@@ -25,7 +26,7 @@ function Results({ results, loading, error }: Props) {
       {!loading && !error && results.length > 0 && (
         <div className={styles.list}>
           {results.map((person) => (
-            <Card key={person.id} person={person} />
+            <Card key={person.id} person={person} onClick={onItemClick} />
           ))}
         </div>
       )}
