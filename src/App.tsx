@@ -3,6 +3,7 @@ import ErrorBoundary from './components/errorBoundary/errorBoundary';
 import MainPage from './pages/main/mainPage';
 import AboutPage from './pages/about/aboutPage';
 import NotFoundPage from './pages/notFound/notFoundPage';
+import DetailsPage from './pages/details/detailsPage';
 import styles from './App.module.css';
 
 function App() {
@@ -23,6 +24,9 @@ function App() {
 
       <Routes>
         <Route path="/" element={<MainPage />} />
+        <Route path="/details/:id" element={<MainPage />}>
+          <Route index element={<DetailsPage />} />
+        </Route>
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

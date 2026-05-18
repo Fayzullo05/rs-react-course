@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Search from '../search/search';
 import Results from '../results/results';
 import type { Person } from '../../types/person';
 import ErrorButton from '../errorButton/errorButton';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import styles from './layout.module.css';
-import { useSearchParams } from 'react-router-dom';
 import Pagination from '../pagination/pagination';
 
 type PeopleResponse = {
@@ -15,17 +16,28 @@ type PeopleResponse = {
   results: Person[];
 };
 
-function Layout() {
+type Props = {
+  detailsSlot?: ReactNode;
+};
+
+function Layout({ detailsSlot }: Props) {
+  const { id: detailsId } = useParams();
   const [searchTerm, setSearchTerm] = useLocalStorage('searchTerm');
   const [results, setResults] = useState<Person[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
   const pageFromUrl = Number(searchParams.get('page') ?? '1');
   const currentPage =
     Number.isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
   const [totalPages, setTotalPages] = useState(1);
+
+  const handleItemClick = (personId: number) => {
+    navigate(`/details/${personId}?page=${currentPage}`);
+  };
 
   const fetchData = useCallback(async (term: string, page: number) => {
     await Promise.resolve();
@@ -88,28 +100,48 @@ function Layout() {
     if (trimmed === searchTerm) return;
 
     setSearchTerm(trimmed);
-    setSearchParams({ page: '1' });
+    navigate('/?page=1');
   };
 
   const handlePageChange = (page: number) => {
-    setSearchParams({ page: String(page) });
+    if (detailsId) {
+      navigate(`/details/${detailsId}?page=${page}`);
+      return;
+    }
+
+    navigate(`/?page=${page}`);
   };
 
   return (
     <div className={styles.wrapper}>
-      <Search value={searchTerm} onSearch={handleSearch} />
+      <div className={detailsSlot ? styles.splitLayout : styles.content}>
+        <div className={styles.mainPanel}>
+          <Search value={searchTerm} onSearch={handleSearch} />
 
-      <Results results={results} loading={loading} error={error} />
+          <Results
+            results={results}
+            loading={loading}
+            error={error}
+            onItemClick={handleItemClick}
+          />
 
-      {!loading && !error && results.length > 0 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
+          {!loading && !error && results.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
 
-      <ErrorButton />
+          <div className={styles.errorButtonWrapper}>
+            <ErrorButton />
+          </div>
+        </div>
+
+        {detailsSlot && (
+          <div className={styles.detailsPanel}>{detailsSlot}</div>
+        )}
+      </div>
     </div>
   );
 }

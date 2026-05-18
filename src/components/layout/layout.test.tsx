@@ -223,4 +223,18 @@ describe('Layout', () => {
       );
     });
   });
+
+  test('opens details route when result card is clicked', async () => {
+    const user = userEvent.setup();
+
+    renderLayout('/?page=2');
+
+    await screen.findByText('Rick Sanchez');
+
+    await user.click(screen.getByRole('button', { name: /rick sanchez/i }));
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/');
+    });
+  });
 });

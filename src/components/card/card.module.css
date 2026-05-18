@@ -1,6 +1,6 @@
 .card {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   border-radius: 10px;
   background: #f8f8ff;
   border: 1px solid #e2e0ff;
@@ -13,12 +13,8 @@
 
 .card:hover {
   border-color: #5048e9;
+  box-shadow: 0 6px 14px rgba(80, 72, 233, 0.12);
   transform: translateY(-1px);
-}
-
-.card:focus-visible {
-  outline: 2px solid #5048e9;
-  outline-offset: 3px;
 }
 
 .title {
@@ -29,8 +25,8 @@
 
 .info {
   display: flex;
-  justify-content: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 10px 16px;
   color: #5f5a75;
   font-size: 14px;
 }
