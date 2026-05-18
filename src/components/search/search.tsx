@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import styles from './search.module.css';
 
@@ -7,59 +7,61 @@ type Props = {
   onSearch: (value: string) => void;
 };
 
-type State = {
+type InputState = {
   inputValue: string;
+  previousValue: string;
 };
 
-class Search extends Component<Props, State> {
-  state: State = {
-    inputValue: this.props.value,
-  };
+function Search({ value, onSearch }: Props) {
+  const [state, setState] = useState<InputState>({
+    inputValue: value,
+    previousValue: value,
+  });
 
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.value !== this.props.value) {
-      this.setState({ inputValue: this.props.value });
-    }
+  if (state.previousValue !== value) {
+    setState({
+      inputValue: value,
+      previousValue: value,
+    });
   }
 
-  handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    this.setState({ inputValue: e.target.value });
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setState({
+      inputValue: e.target.value,
+      previousValue: value,
+    });
   };
 
-  handleSearch = () => {
-    this.props.onSearch(this.state.inputValue);
+  const handleSearch = () => {
+    onSearch(state.inputValue);
   };
 
-  handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      this.handleSearch();
+      handleSearch();
     }
   };
 
-  render() {
-    const { inputValue } = this.state;
+  return (
+    <div className={styles.container}>
+      <div className={styles.title}>Search</div>
 
-    return (
-      <div className={styles.container}>
-        <div className={styles.title}>Search</div>
+      <div className={styles.form}>
+        <input
+          className={styles.input}
+          type="text"
+          placeholder="Enter search term..."
+          value={state.inputValue}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+        />
 
-        <div className={styles.form}>
-          <input
-            className={styles.input}
-            type="text"
-            placeholder="Enter search term..."
-            value={inputValue}
-            onChange={this.handleChange}
-            onKeyDown={this.handleKeyDown}
-          />
-
-          <button className={styles.button} onClick={this.handleSearch}>
-            Search
-          </button>
-        </div>
+        <button className={styles.button} onClick={handleSearch}>
+          Search
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default Search;

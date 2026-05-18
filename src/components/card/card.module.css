@@ -1,8 +1,20 @@
 .card {
-  padding: 12px;
+  width: 100%;
+  padding: 14px;
   border-radius: 10px;
   background: #f8f8ff;
   border: 1px solid #e2e0ff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card:hover {
+  border-color: #5048e9;
+  box-shadow: 0 6px 14px rgba(80, 72, 233, 0.12);
+  transform: translateY(-1px);
 }
 
 .title {
@@ -13,8 +25,8 @@
 
 .info {
   display: flex;
-  justify-content: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 10px 16px;
   color: #5f5a75;
   font-size: 14px;
 }

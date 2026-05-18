@@ -1,7 +1,43 @@
 .wrapper {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+}
+
+.content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  align-items: center;
+}
+
+.splitLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+.mainPanel {
+  min-width: 0;
+}
+
+.detailsPanel {
+  position: sticky;
+  top: 24px;
+}
+
+.errorButtonWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .splitLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .detailsPanel {
+    position: static;
+  }
 }

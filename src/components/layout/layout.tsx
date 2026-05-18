@@ -1,54 +1,68 @@
-import { Component } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Search from '../search/search';
 import Results from '../results/results';
 import type { Person } from '../../types/person';
 import ErrorButton from '../errorButton/errorButton';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 import styles from './layout.module.css';
-
-type State = {
-  searchTerm: string;
-  results: Person[];
-  loading: boolean;
-  error: string | null;
-};
+import Pagination from '../pagination/pagination';
 
 type PeopleResponse = {
+  info: {
+    pages: number;
+  };
   results: Person[];
 };
 
-class Layout extends Component<object, State> {
-  state: State = {
-    searchTerm: '',
-    results: [],
-    loading: false,
-    error: null,
+type Props = {
+  detailsSlot?: ReactNode;
+};
+
+function Layout({ detailsSlot }: Props) {
+  const { id: detailsId } = useParams();
+  const [searchTerm, setSearchTerm] = useLocalStorage('searchTerm');
+  const [results, setResults] = useState<Person[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const pageFromUrl = Number(searchParams.get('page') ?? '1');
+  const currentPage =
+    Number.isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
+  const [totalPages, setTotalPages] = useState(1);
+
+  const handleItemClick = (personId: number) => {
+    navigate(`/details/${personId}?page=${currentPage}`);
   };
 
-  componentDidMount() {
-    const saved = localStorage.getItem('searchTerm') || '';
+  const fetchData = useCallback(async (term: string, page: number) => {
+    await Promise.resolve();
 
-    this.setState({ searchTerm: saved }, () => {
-      this.fetchData(saved);
-    });
-  }
-
-  fetchData = async (term: string) => {
-    this.setState({ loading: true, error: null });
+    setLoading(true);
+    setError(null);
 
     try {
-      const url = term
-        ? `https://rickandmortyapi.com/api/character/?name=${encodeURIComponent(
-            term
-          )}`
-        : 'https://rickandmortyapi.com/api/character/';
+      const baseUrl = 'https://rickandmortyapi.com/api/character/';
+      const params = new URLSearchParams();
+
+      params.set('page', String(page));
+
+      if (term) {
+        params.set('name', term);
+      }
+
+      const url = `${baseUrl}?${params.toString()}`;
 
       const res = await fetch(url);
 
       if (res.status === 404) {
-        this.setState({
-          results: [],
-          loading: false,
-        });
+        setResults([]);
+        setTotalPages(1);
+        setLoading(false);
         return;
       }
 
@@ -58,45 +72,78 @@ class Layout extends Component<object, State> {
 
       const data = (await res.json()) as PeopleResponse;
 
-      this.setState({
-        results: data.results,
-        loading: false,
-      });
+      setResults(data.results);
+      setTotalPages(data.info.pages);
+      setLoading(false);
     } catch {
-      this.setState({
-        results: [],
-        error:
-          'Failed to load results. Please check your connection or try again later.',
-        loading: false,
-      });
+      setResults([]);
+      setError(
+        'Failed to load results. Please check your connection or try again later.'
+      );
+      setLoading(false);
     }
-  };
+  }, []);
 
-  handleSearch = (value: string) => {
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void fetchData(searchTerm, currentPage);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [fetchData, searchTerm, currentPage]);
+
+  const handleSearch = (value: string) => {
     const trimmed = value.trim();
 
-    if (trimmed === this.state.searchTerm) return;
+    if (trimmed === searchTerm) return;
 
-    localStorage.setItem('searchTerm', trimmed);
-
-    this.setState({ searchTerm: trimmed }, () => this.fetchData(trimmed));
+    setSearchTerm(trimmed);
+    navigate('/?page=1');
   };
 
-  render() {
-    return (
-      <div className={styles.wrapper}>
-        <Search value={this.state.searchTerm} onSearch={this.handleSearch} />
+  const handlePageChange = (page: number) => {
+    if (detailsId) {
+      navigate(`/details/${detailsId}?page=${page}`);
+      return;
+    }
 
-        <Results
-          results={this.state.results}
-          loading={this.state.loading}
-          error={this.state.error}
-        />
+    navigate(`/?page=${page}`);
+  };
 
-        <ErrorButton />
+  return (
+    <div className={styles.wrapper}>
+      <div className={detailsSlot ? styles.splitLayout : styles.content}>
+        <div className={styles.mainPanel}>
+          <Search value={searchTerm} onSearch={handleSearch} />
+
+          <Results
+            results={results}
+            loading={loading}
+            error={error}
+            onItemClick={handleItemClick}
+          />
+
+          {!loading && !error && results.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
+
+          <div className={styles.errorButtonWrapper}>
+            <ErrorButton />
+          </div>
+        </div>
+
+        {detailsSlot && (
+          <div className={styles.detailsPanel}>{detailsSlot}</div>
+        )}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default Layout;
