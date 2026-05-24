@@ -8,6 +8,8 @@ import ErrorButton from '../errorButton/errorButton';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import styles from './layout.module.css';
 import Pagination from '../pagination/pagination';
+import { toggleSelectedItem } from '../../store/selectedItems/selectedItemsSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 type PeopleResponse = {
   info: {
@@ -34,6 +36,14 @@ function Layout({ detailsSlot }: Props) {
   const currentPage =
     Number.isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
   const [totalPages, setTotalPages] = useState(1);
+
+  const dispatch = useAppDispatch();
+  const selectedItems = useAppSelector((state) => state.selectedItems.items);
+  const selectedIds = selectedItems.map((item) => item.id);
+
+  const handleItemSelect = (person: Person) => {
+    dispatch(toggleSelectedItem(person));
+  };
 
   const handleItemClick = (personId: number) => {
     navigate(`/details/${personId}?page=${currentPage}`);
@@ -122,7 +132,9 @@ function Layout({ detailsSlot }: Props) {
             results={results}
             loading={loading}
             error={error}
+            selectedIds={selectedIds}
             onItemClick={handleItemClick}
+            onItemSelect={handleItemSelect}
           />
 
           {!loading && !error && results.length > 0 && (

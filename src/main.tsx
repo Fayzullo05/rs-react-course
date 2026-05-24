@@ -16,5 +16,5 @@ createRoot(rootElement).render(
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </Provider>,
+  </Provider>
 );

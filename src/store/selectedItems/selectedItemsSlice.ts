@@ -16,12 +16,12 @@ const selectedItemsSlice = createSlice({
     toggleSelectedItem: (state, action: PayloadAction<Person>) => {
       const item = action.payload;
       const existingItem = state.items.find(
-        (selectedItem) => selectedItem.id === item.id,
+        (selectedItem) => selectedItem.id === item.id
       );
 
       if (existingItem) {
         state.items = state.items.filter(
-          (selectedItem) => selectedItem.id !== item.id,
+          (selectedItem) => selectedItem.id !== item.id
         );
         return;
       }
@@ -39,4 +39,3 @@ export const { toggleSelectedItem, clearSelectedItems } =
   selectedItemsSlice.actions;
 
 export default selectedItemsSlice.reducer;
-

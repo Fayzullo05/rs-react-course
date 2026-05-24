@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import App from './App';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 const mockPeople = [
   {
@@ -34,9 +36,11 @@ describe('App', () => {
 
   test('renders main page by default', async () => {
     render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      </Provider>
     );
 
     expect(screen.getByRole('link', { name: /main/i })).toBeInTheDocument();
@@ -46,9 +50,11 @@ describe('App', () => {
 
   test('renders about page route', () => {
     render(
-      <MemoryRouter initialEntries={['/about']}>
-        <App />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/about']}>
+          <App />
+        </MemoryRouter>
+      </Provider>
     );
 
     expect(screen.getByRole('heading', { name: /about/i })).toBeInTheDocument();
@@ -60,9 +66,11 @@ describe('App', () => {
 
   test('renders not found page for unknown route', () => {
     render(
-      <MemoryRouter initialEntries={['/unknown-page']}>
-        <App />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/unknown-page']}>
+          <App />
+        </MemoryRouter>
+      </Provider>
     );
 
     expect(screen.getByRole('heading', { name: /404/i })).toBeInTheDocument();

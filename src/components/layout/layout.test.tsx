@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import Layout from './layout';
+import { Provider } from 'react-redux';
+import { store } from '../../store/store';
 
 const mockPeople = [
   {
@@ -16,9 +18,11 @@ const mockPeople = [
 
 const renderLayout = (initialRoute = '/') => {
   return render(
-    <MemoryRouter initialEntries={[initialRoute]}>
-      <Layout />
-    </MemoryRouter>
+    <Provider store={store}>
+      <MemoryRouter initialEntries={[initialRoute]}>
+        <Layout />
+      </MemoryRouter>
+    </Provider>
   );
 };
 
