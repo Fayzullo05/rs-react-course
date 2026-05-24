@@ -10,6 +10,7 @@ import styles from './layout.module.css';
 import Pagination from '../pagination/pagination';
 import { toggleSelectedItem } from '../../store/selectedItems/selectedItemsSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import SelectedItemsFlyout from '../selectedItemsFlyout/selectedItemsFlyout';
 
 type PeopleResponse = {
   info: {
@@ -148,6 +149,8 @@ function Layout({ detailsSlot }: Props) {
           <div className={styles.errorButtonWrapper}>
             <ErrorButton />
           </div>
+
+          <SelectedItemsFlyout />
         </div>
 
         {detailsSlot && (
