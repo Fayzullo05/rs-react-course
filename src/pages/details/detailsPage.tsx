@@ -3,6 +3,12 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Loader from '../../components/loader/loader';
 import type { Person } from '../../types/person';
 import styles from './detailsPage.module.css';
+import {
+  Api,
+  QueryParam,
+  RoutePath,
+  PaginationValue,
+} from '../../constants/app';
 
 function DetailsPage() {
   const { id } = useParams();
@@ -16,43 +22,57 @@ function DetailsPage() {
   useEffect(() => {
     if (!id) return;
 
-    const timeoutId = window.setTimeout(() => {
-      const fetchDetails = async () => {
+    const controller = new AbortController();
+
+    const timeoutId = globalThis.setTimeout(() => {
+      const fetchDetails = async (): Promise<void> => {
         setLoading(true);
         setError(null);
 
         try {
-          const response = await fetch(
-            `https://rickandmortyapi.com/api/character/${id}`
-          );
+          const response = await fetch(`${Api.characterBaseUrl}${id}`, {
+            signal: controller.signal,
+          });
 
-          if (!response.ok) {
+          if (response.ok === false) {
             throw new Error('Failed to fetch character details');
           }
 
           const data = (await response.json()) as Person;
 
+          if (controller.signal.aborted) {
+            return;
+          }
+
           setPerson(data);
         } catch {
+          if (controller.signal.aborted) {
+            return;
+          }
+
           setPerson(null);
           setError('Failed to load character details.');
         } finally {
-          setLoading(false);
+          if (controller.signal.aborted === false) {
+            setLoading(false);
+          }
         }
       };
 
-      void fetchDetails();
+      fetchDetails();
     }, 0);
 
     return () => {
-      window.clearTimeout(timeoutId);
+      controller.abort();
+      globalThis.clearTimeout(timeoutId);
     };
   }, [id]);
 
   const handleClose = () => {
-    const page = searchParams.get('page') ?? '1';
+    const page =
+      searchParams.get(QueryParam.page) ?? String(PaginationValue.firstPage);
 
-    navigate(`/?page=${page}`);
+    navigate(`${RoutePath.main}?${QueryParam.page}=${page}`);
   };
 
   return (

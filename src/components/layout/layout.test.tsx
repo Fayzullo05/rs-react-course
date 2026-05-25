@@ -55,7 +55,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1'
+        'https://rickandmortyapi.com/api/character/?page=1',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
 
@@ -73,7 +76,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=morty'
+        'https://rickandmortyapi.com/api/character/?page=1&name=morty',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
@@ -107,7 +113,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=morty'
+        'https://rickandmortyapi.com/api/character/?page=1&name=morty',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
@@ -130,7 +139,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=rick'
+        'https://rickandmortyapi.com/api/character/?page=1&name=rick',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
@@ -207,7 +219,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=2'
+        'https://rickandmortyapi.com/api/character/?page=2',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
@@ -223,7 +238,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=2'
+        'https://rickandmortyapi.com/api/character/?page=2',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
