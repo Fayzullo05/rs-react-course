@@ -1,9 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import App from './App';
-import { Provider } from 'react-redux';
 import { store } from './store/store';
+import { ThemeProvider } from './context/theme/themeProvider';
 
 const mockPeople = [
   {
@@ -14,6 +15,18 @@ const mockPeople = [
     gender: 'Male',
   },
 ];
+
+const renderApp = (initialRoute = '/') => {
+  return render(
+    <Provider store={store}>
+      <ThemeProvider>
+        <MemoryRouter initialEntries={[initialRoute]}>
+          <App />
+        </MemoryRouter>
+      </ThemeProvider>
+    </Provider>
+  );
+};
 
 describe('App', () => {
   beforeEach(() => {
@@ -35,13 +48,7 @@ describe('App', () => {
   });
 
   test('renders main page by default', async () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <App />
-        </MemoryRouter>
-      </Provider>
-    );
+    renderApp();
 
     expect(screen.getByRole('link', { name: /main/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument();
@@ -49,13 +56,7 @@ describe('App', () => {
   });
 
   test('renders about page route', () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/about']}>
-          <App />
-        </MemoryRouter>
-      </Provider>
-    );
+    renderApp('/about');
 
     expect(screen.getByRole('heading', { name: /about/i })).toBeInTheDocument();
     expect(screen.getByText(/fayzullaxon sharipxanov/i)).toBeInTheDocument();
@@ -65,13 +66,7 @@ describe('App', () => {
   });
 
   test('renders not found page for unknown route', () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/unknown-page']}>
-          <App />
-        </MemoryRouter>
-      </Provider>
-    );
+    renderApp('/unknown-page');
 
     expect(screen.getByRole('heading', { name: /404/i })).toBeInTheDocument();
     expect(screen.getByText(/page not found/i)).toBeInTheDocument();

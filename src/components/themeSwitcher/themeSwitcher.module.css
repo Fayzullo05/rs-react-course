@@ -1,0 +1,28 @@
+.switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.button,
+.active {
+  padding: 6px 10px;
+  border: 1px solid #5048e9;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.button {
+  background: var(--card-bg);
+  color: #5048e9;
+}
+
+.active {
+  background: #5048e9;
+  color: #ffffff;
+}

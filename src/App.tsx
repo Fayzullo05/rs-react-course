@@ -5,6 +5,7 @@ import AboutPage from './pages/about/aboutPage';
 import NotFoundPage from './pages/notFound/notFoundPage';
 import DetailsPage from './pages/details/detailsPage';
 import styles from './App.module.css';
+import ThemeSwitcher from './components/themeSwitcher/themeSwitcher';
 
 function App() {
   const getNavLinkClassName = ({ isActive }: { isActive: boolean }) => {
@@ -20,6 +21,7 @@ function App() {
         <NavLink className={getNavLinkClassName} to="/about">
           About
         </NavLink>
+        <ThemeSwitcher />
       </nav>
 
       <Routes>
