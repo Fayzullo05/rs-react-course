@@ -5,7 +5,7 @@ import Search from './search';
 
 describe('Search', () => {
   test('renders search input and button', () => {
-    render(<Search value="" onSearch={vi.fn()} />);
+    render(<Search initialSearchTerm="" onSearch={vi.fn()} />);
 
     expect(
       screen.getByPlaceholderText(/enter search term/i)
@@ -14,7 +14,7 @@ describe('Search', () => {
   });
 
   test('shows initial value from props', () => {
-    render(<Search value="rick" onSearch={vi.fn()} />);
+    render(<Search initialSearchTerm="rick" onSearch={vi.fn()} />);
 
     expect(screen.getByPlaceholderText(/enter search term/i)).toHaveValue(
       'rick'
@@ -24,7 +24,7 @@ describe('Search', () => {
   test('updates input value when user types', async () => {
     const user = userEvent.setup();
 
-    render(<Search value="" onSearch={vi.fn()} />);
+    render(<Search initialSearchTerm="" onSearch={vi.fn()} />);
 
     const input = screen.getByPlaceholderText(/enter search term/i);
 
@@ -37,7 +37,7 @@ describe('Search', () => {
     const user = userEvent.setup();
     const onSearch = vi.fn();
 
-    render(<Search value="" onSearch={onSearch} />);
+    render(<Search initialSearchTerm="" onSearch={onSearch} />);
 
     const input = screen.getByPlaceholderText(/enter search term/i);
     const button = screen.getByRole('button', { name: /search/i });
@@ -53,7 +53,7 @@ describe('Search', () => {
     const user = userEvent.setup();
     const onSearch = vi.fn();
 
-    render(<Search value="" onSearch={onSearch} />);
+    render(<Search initialSearchTerm="" onSearch={onSearch} />);
 
     const input = screen.getByPlaceholderText(/enter search term/i);
 
@@ -62,17 +62,5 @@ describe('Search', () => {
 
     expect(onSearch).toHaveBeenCalledTimes(1);
     expect(onSearch).toHaveBeenCalledWith('beth');
-  });
-
-  test('updates input when value prop changes', () => {
-    const { rerender } = render(<Search value="rick" onSearch={vi.fn()} />);
-
-    const input = screen.getByPlaceholderText(/enter search term/i);
-
-    expect(input).toHaveValue('rick');
-
-    rerender(<Search value="morty" onSearch={vi.fn()} />);
-
-    expect(input).toHaveValue('morty');
   });
 });

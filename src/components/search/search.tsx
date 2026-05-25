@@ -1,44 +1,22 @@
-import { useState } from 'react';
-import type { ChangeEvent, KeyboardEvent } from 'react';
+import { useRef } from 'react';
+import type { KeyboardEvent } from 'react';
 import styles from './search.module.css';
 
-type Props = {
-  value: string;
-  onSearch: (value: string) => void;
+type SearchProps = {
+  initialSearchTerm: string;
+  onSearch: (searchTerm: string) => void;
 };
 
-type InputState = {
-  inputValue: string;
-  previousValue: string;
-};
+function Search({ initialSearchTerm, onSearch }: Readonly<SearchProps>) {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-function Search({ value, onSearch }: Props) {
-  const [state, setState] = useState<InputState>({
-    inputValue: value,
-    previousValue: value,
-  });
-
-  if (state.previousValue !== value) {
-    setState({
-      inputValue: value,
-      previousValue: value,
-    });
-  }
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setState({
-      inputValue: e.target.value,
-      previousValue: value,
-    });
+  const submitSearch = (): void => {
+    onSearch(inputRef.current?.value ?? '');
   };
 
-  const handleSearch = () => {
-    onSearch(state.inputValue);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
+    if (event.key === 'Enter') {
+      submitSearch();
     }
   };
 
@@ -48,15 +26,15 @@ function Search({ value, onSearch }: Props) {
 
       <div className={styles.form}>
         <input
+          ref={inputRef}
           className={styles.input}
           type="text"
           placeholder="Enter search term..."
-          value={state.inputValue}
-          onChange={handleChange}
+          defaultValue={initialSearchTerm}
           onKeyDown={handleKeyDown}
         />
 
-        <button className={styles.button} onClick={handleSearch}>
+        <button className={styles.button} onClick={submitSearch}>
           Search
         </button>
       </div>
