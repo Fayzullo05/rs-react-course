@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import Layout from './layout';
+import { Provider } from 'react-redux';
+import { store } from '../../store/store';
 
 const mockPeople = [
   {
@@ -16,9 +18,11 @@ const mockPeople = [
 
 const renderLayout = (initialRoute = '/') => {
   return render(
-    <MemoryRouter initialEntries={[initialRoute]}>
-      <Layout />
-    </MemoryRouter>
+    <Provider store={store}>
+      <MemoryRouter initialEntries={[initialRoute]}>
+        <Layout />
+      </MemoryRouter>
+    </Provider>
   );
 };
 
@@ -51,7 +55,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1'
+        'https://rickandmortyapi.com/api/character/?page=1',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
 
@@ -69,7 +76,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=morty'
+        'https://rickandmortyapi.com/api/character/?page=1&name=morty',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
@@ -103,7 +113,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=morty'
+        'https://rickandmortyapi.com/api/character/?page=1&name=morty',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
@@ -126,7 +139,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=rick'
+        'https://rickandmortyapi.com/api/character/?page=1&name=rick',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
@@ -203,7 +219,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=2'
+        'https://rickandmortyapi.com/api/character/?page=2',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });
@@ -219,7 +238,10 @@ describe('Layout', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=2'
+        'https://rickandmortyapi.com/api/character/?page=2',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
   });

@@ -53,7 +53,10 @@ describe('DetailsPage', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/1'
+        'https://rickandmortyapi.com/api/character/1',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
       );
     });
 

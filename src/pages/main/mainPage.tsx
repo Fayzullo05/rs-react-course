@@ -1,8 +1,7 @@
-import { Outlet } from 'react-router-dom';
 import Layout from '../../components/layout/layout';
 
 function MainPage() {
-  return <Layout detailsSlot={<Outlet />} />;
+  return <Layout />;
 }
 
 export default MainPage;

@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  useNavigate,
+  useParams,
+  useSearchParams,
+  Outlet,
+} from 'react-router-dom';
 import Search from '../search/search';
 import Results from '../results/results';
 import type { Person } from '../../types/person';
@@ -8,6 +12,17 @@ import ErrorButton from '../errorButton/errorButton';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import styles from './layout.module.css';
 import Pagination from '../pagination/pagination';
+import { toggleSelectedItem } from '../../store/selectedItems/selectedItemsSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import SelectedItemsFlyout from '../selectedItemsFlyout/selectedItemsFlyout';
+import {
+  Api,
+  HttpStatus,
+  PaginationValue,
+  QueryParam,
+  RoutePath,
+  StorageKey,
+} from '../../constants/app';
 
 type PeopleResponse = {
   info: {
@@ -16,81 +31,105 @@ type PeopleResponse = {
   results: Person[];
 };
 
-type Props = {
-  detailsSlot?: ReactNode;
-};
-
-function Layout({ detailsSlot }: Props) {
+function Layout() {
   const { id: detailsId } = useParams();
-  const [searchTerm, setSearchTerm] = useLocalStorage('searchTerm');
+  const [searchTerm, setSearchTerm] = useLocalStorage(StorageKey.searchTerm);
   const [results, setResults] = useState<Person[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const hasDetailsPanel = Boolean(detailsId);
+
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-  const pageFromUrl = Number(searchParams.get('page') ?? '1');
+  const pageFromUrl = Number(
+    searchParams.get(QueryParam.page) ?? String(PaginationValue.firstPage)
+  );
+
   const currentPage =
-    Number.isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
+    Number.isNaN(pageFromUrl) || pageFromUrl < PaginationValue.firstPage
+      ? PaginationValue.firstPage
+      : pageFromUrl;
   const [totalPages, setTotalPages] = useState(1);
+
+  const dispatch = useAppDispatch();
+  const selectedItems = useAppSelector((state) => state.selectedItems.items);
+  const selectedIds = selectedItems.map((item) => item.id);
+
+  const handleItemSelect = (person: Person) => {
+    dispatch(toggleSelectedItem(person));
+  };
 
   const handleItemClick = (personId: number) => {
     navigate(`/details/${personId}?page=${currentPage}`);
   };
 
-  const fetchData = useCallback(async (term: string, page: number) => {
-    await Promise.resolve();
+  const fetchData = useCallback(
+    async (term: string, page: number, signal: AbortSignal): Promise<void> => {
+      setLoading(true);
+      setError(null);
 
-    setLoading(true);
-    setError(null);
+      try {
+        const baseUrl = Api.characterBaseUrl;
+        const params = new URLSearchParams();
 
-    try {
-      const baseUrl = 'https://rickandmortyapi.com/api/character/';
-      const params = new URLSearchParams();
+        params.set(QueryParam.page, String(page));
 
-      params.set('page', String(page));
+        if (term) {
+          params.set(QueryParam.name, term);
+        }
 
-      if (term) {
-        params.set('name', term);
-      }
+        const url = `${baseUrl}?${params.toString()}`;
 
-      const url = `${baseUrl}?${params.toString()}`;
+        const res = await fetch(url, { signal });
 
-      const res = await fetch(url);
+        if (res.status === HttpStatus.notFound) {
+          setResults([]);
+          setTotalPages(1);
+          return;
+        }
 
-      if (res.status === 404) {
+        if (!res.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const data = (await res.json()) as PeopleResponse;
+
+        if (signal.aborted) {
+          return;
+        }
+
+        setResults(data.results);
+        setTotalPages(data.info.pages);
+      } catch {
+        if (signal.aborted) {
+          return;
+        }
+
         setResults([]);
-        setTotalPages(1);
-        setLoading(false);
-        return;
+        setError(
+          'Failed to load results. Please check your connection or try again later.'
+        );
+      } finally {
+        if (!signal.aborted) {
+          setLoading(false);
+        }
       }
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch data');
-      }
-
-      const data = (await res.json()) as PeopleResponse;
-
-      setResults(data.results);
-      setTotalPages(data.info.pages);
-      setLoading(false);
-    } catch {
-      setResults([]);
-      setError(
-        'Failed to load results. Please check your connection or try again later.'
-      );
-      setLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      void fetchData(searchTerm, currentPage);
+    const controller = new AbortController();
+
+    const timeoutId = globalThis.setTimeout(() => {
+      fetchData(searchTerm, currentPage, controller.signal);
     }, 0);
 
     return () => {
-      window.clearTimeout(timeoutId);
+      controller.abort();
+      globalThis.clearTimeout(timeoutId);
     };
   }, [fetchData, searchTerm, currentPage]);
 
@@ -100,7 +139,9 @@ function Layout({ detailsSlot }: Props) {
     if (trimmed === searchTerm) return;
 
     setSearchTerm(trimmed);
-    navigate('/?page=1');
+    navigate(
+      `${RoutePath.main}?${QueryParam.page}=${PaginationValue.firstPage}`
+    );
   };
 
   const handlePageChange = (page: number) => {
@@ -109,20 +150,22 @@ function Layout({ detailsSlot }: Props) {
       return;
     }
 
-    navigate(`/?page=${page}`);
+    navigate(`${RoutePath.main}?${QueryParam.page}=${page}`);
   };
 
   return (
     <div className={styles.wrapper}>
-      <div className={detailsSlot ? styles.splitLayout : styles.content}>
+      <div className={hasDetailsPanel ? styles.splitLayout : styles.content}>
         <div className={styles.mainPanel}>
-          <Search value={searchTerm} onSearch={handleSearch} />
+          <Search initialSearchTerm={searchTerm} onSearch={handleSearch} />
 
           <Results
             results={results}
             loading={loading}
             error={error}
+            selectedIds={selectedIds}
             onItemClick={handleItemClick}
+            onItemSelect={handleItemSelect}
           />
 
           {!loading && !error && results.length > 0 && (
@@ -136,10 +179,14 @@ function Layout({ detailsSlot }: Props) {
           <div className={styles.errorButtonWrapper}>
             <ErrorButton />
           </div>
+
+          <SelectedItemsFlyout />
         </div>
 
-        {detailsSlot && (
-          <div className={styles.detailsPanel}>{detailsSlot}</div>
+        {hasDetailsPanel && (
+          <div className={styles.detailsPanel}>
+            <Outlet />
+          </div>
         )}
       </div>
     </div>

@@ -7,10 +7,19 @@ type Props = {
   results: Person[];
   loading: boolean;
   error: string | null;
+  selectedIds?: number[];
   onItemClick?: (personId: number) => void;
+  onItemSelect?: (person: Person) => void;
 };
 
-function Results({ results, loading, error, onItemClick }: Props) {
+function Results({
+  results,
+  loading,
+  error,
+  selectedIds = [],
+  onItemClick,
+  onItemSelect,
+}: Props) {
   return (
     <div className={styles.container}>
       <div className={styles.title}>Results</div>
@@ -26,7 +35,13 @@ function Results({ results, loading, error, onItemClick }: Props) {
       {!loading && !error && results.length > 0 && (
         <div className={styles.list}>
           {results.map((person) => (
-            <Card key={person.id} person={person} onClick={onItemClick} />
+            <Card
+              key={person.id}
+              person={person}
+              selected={selectedIds.includes(person.id)}
+              onClick={onItemClick}
+              onSelect={onItemSelect}
+            />
           ))}
         </div>
       )}

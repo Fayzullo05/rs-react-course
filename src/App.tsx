@@ -5,6 +5,8 @@ import AboutPage from './pages/about/aboutPage';
 import NotFoundPage from './pages/notFound/notFoundPage';
 import DetailsPage from './pages/details/detailsPage';
 import styles from './App.module.css';
+import ThemeSwitcher from './components/themeSwitcher/themeSwitcher';
+import { RoutePath } from './constants/app';
 
 function App() {
   const getNavLinkClassName = ({ isActive }: { isActive: boolean }) => {
@@ -14,21 +16,21 @@ function App() {
   return (
     <ErrorBoundary>
       <nav className={styles.nav}>
-        <NavLink className={getNavLinkClassName} to="/">
+        <NavLink className={getNavLinkClassName} to={RoutePath.main}>
           Main
         </NavLink>
-        <NavLink className={getNavLinkClassName} to="/about">
+        <NavLink className={getNavLinkClassName} to={RoutePath.about}>
           About
         </NavLink>
+        <ThemeSwitcher />
       </nav>
 
       <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/details/:id" element={<MainPage />}>
-          <Route index element={<DetailsPage />} />
+        <Route path={RoutePath.main} element={<MainPage />}>
+          <Route path={RoutePath.details} element={<DetailsPage />} />
         </Route>
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path={RoutePath.about} element={<AboutPage />} />
+        <Route path={RoutePath.notFound} element={<NotFoundPage />} />
       </Routes>
     </ErrorBoundary>
   );
