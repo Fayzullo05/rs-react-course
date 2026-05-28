@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import App from './App';
 import { store } from './store/store';
+import { peopleApi } from './store/api/peopleApi';
 import { ThemeProvider } from './context/theme/themeProvider';
 
 const mockPeople = [
@@ -15,6 +16,14 @@ const mockPeople = [
     gender: 'Male',
   },
 ];
+
+const createFetchResponse = (body: unknown, status = 200): Response =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
 const renderApp = (initialRoute = '/') => {
   return render(
@@ -31,19 +40,18 @@ const renderApp = (initialRoute = '/') => {
 describe('App', () => {
   beforeEach(() => {
     localStorage.clear();
+    store.dispatch(peopleApi.util.resetApiState());
 
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({
+      vi.fn().mockResolvedValue(
+        createFetchResponse({
           info: {
             pages: 3,
           },
           results: mockPeople,
-        }),
-      })
+        })
+      )
     );
   });
 
