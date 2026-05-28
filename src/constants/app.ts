@@ -4,6 +4,7 @@ export const Api = {
 
 export const HttpStatus = {
   notFound: 404,
+  ok: 200,
 } as const;
 
 export const QueryParam = {
