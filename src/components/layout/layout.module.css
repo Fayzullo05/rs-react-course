@@ -41,3 +41,16 @@
     position: static;
   }
 }
+
+.refreshButton {
+  align-self: flex-start;
+  padding: 8px 14px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.refreshButton:hover {
+  opacity: 0.8;
+}

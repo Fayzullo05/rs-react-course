@@ -20,7 +20,7 @@ import {
   RoutePath,
   StorageKey,
 } from '../../constants/app';
-import { useGetPeopleQuery } from '../../store/api/peopleApi';
+import { useGetPeopleQuery, peopleApi } from '../../store/api/peopleApi';
 
 function Layout() {
   const { id: detailsId } = useParams();
@@ -84,11 +84,30 @@ function Layout() {
     navigate(`${RoutePath.main}?${QueryParam.page}=${page}`);
   };
 
+  const handleRefresh = () => {
+    dispatch(
+      peopleApi.util.invalidateTags([
+        {
+          type: 'People',
+          id: `${searchTerm}-${currentPage}`,
+        },
+      ])
+    );
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={hasDetailsPanel ? styles.splitLayout : styles.content}>
         <div className={styles.mainPanel}>
           <Search initialSearchTerm={searchTerm} onSearch={handleSearch} />
+
+          <button
+            className={styles.refreshButton}
+            type="button"
+            onClick={handleRefresh}
+          >
+            Refresh
+          </button>
 
           <Results
             results={results}

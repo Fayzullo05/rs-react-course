@@ -241,4 +241,24 @@ describe('Layout', () => {
 
     expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
   });
+
+  test('refresh button invalidates cache and refetches current page', async () => {
+    const user = userEvent.setup();
+
+    renderLayout('/?page=2');
+
+    await screen.findByText('Rick Sanchez');
+
+    const fetchMock = vi.mocked(globalThis.fetch);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    expect(getFetchUrl(1)).toContain('page=2');
+  });
 });
