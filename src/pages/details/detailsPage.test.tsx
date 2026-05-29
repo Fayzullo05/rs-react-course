@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import DetailsPage from './detailsPage';
+import { store } from '../../store/store';
+import { peopleApi } from '../../store/api/peopleApi';
+import { Provider } from 'react-redux';
 
 const mockPerson = {
   id: 1,
@@ -11,6 +14,7 @@ const mockPerson = {
   species: 'Human',
   gender: 'Male',
   image: 'https://example.com/rick.png',
+  type: '',
   origin: {
     name: 'Earth (C-137)',
   },
@@ -19,28 +23,42 @@ const mockPerson = {
   },
 };
 
+const createFetchResponse = (body: unknown, status = 200): Response =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+const getFetchUrl = (callIndex = 0): string => {
+  const fetchCall = vi.mocked(globalThis.fetch).mock.calls[callIndex][0];
+
+  return fetchCall instanceof Request ? fetchCall.url : String(fetchCall);
+};
+
 const renderDetailsPage = (initialRoute = '/details/1?page=2') => {
   return render(
-    <MemoryRouter initialEntries={[initialRoute]}>
-      <Routes>
-        <Route path="/details/:id" element={<DetailsPage />} />
-        <Route path="/" element={<div>Main page</div>} />
-      </Routes>
-    </MemoryRouter>
+    <Provider store={store}>
+      <MemoryRouter initialEntries={[initialRoute]}>
+        <Routes>
+          <Route path="/details/:id" element={<DetailsPage />} />
+          <Route path="/" element={<p>Main page</p>} />
+        </Routes>
+      </MemoryRouter>
+    </Provider>
   );
 };
 
 describe('DetailsPage', () => {
   beforeEach(() => {
+    localStorage.clear();
+    store.dispatch(peopleApi.util.resetApiState());
     vi.restoreAllMocks();
 
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => mockPerson,
-      })
+      vi.fn(() => Promise.resolve(createFetchResponse(mockPerson)))
     );
   });
 
@@ -51,16 +69,14 @@ describe('DetailsPage', () => {
   test('fetches and renders character details', async () => {
     renderDetailsPage();
 
+    expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
+
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/1',
-        expect.objectContaining({
-          signal: expect.any(AbortSignal),
-        })
+      expect(getFetchUrl()).toContain(
+        'https://rickandmortyapi.com/api/character/1'
       );
     });
 
-    expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
     expect(screen.getByText('Alive')).toBeInTheDocument();
     expect(screen.getByText('Human')).toBeInTheDocument();
     expect(screen.getByText('Male')).toBeInTheDocument();
@@ -71,12 +87,7 @@ describe('DetailsPage', () => {
   test('shows loading state while details are loading', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(
-        () =>
-          new Promise(() => {
-            // pending request
-          })
-      )
+      vi.fn(() => new Promise(() => {}))
     );
 
     renderDetailsPage();
@@ -87,7 +98,7 @@ describe('DetailsPage', () => {
   test('shows error message when details request fails', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockRejectedValue(new Error('Network error'))
+      vi.fn(() => Promise.reject(new Error('Network error')))
     );
 
     renderDetailsPage();
@@ -97,7 +108,7 @@ describe('DetailsPage', () => {
     ).toBeInTheDocument();
   });
 
-  test('closes details panel and keeps current page in URL', async () => {
+  test('closes details panel and navigates to main page', async () => {
     const user = userEvent.setup();
 
     renderDetailsPage('/details/1?page=2');
