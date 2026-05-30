@@ -73,3 +73,16 @@
   color: #de1f1f;
   text-align: center;
 }
+
+.refreshButton {
+  margin-left: 8px;
+  padding: 8px 14px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.refreshButton:hover {
+  opacity: 0.8;
+}

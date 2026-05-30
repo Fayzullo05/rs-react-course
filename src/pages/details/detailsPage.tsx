@@ -2,7 +2,8 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Loader from '../../components/loader/loader';
 import styles from './detailsPage.module.css';
 import { QueryParam, RoutePath, PaginationValue } from '../../constants/app';
-import { useGetPersonByIdQuery } from '../../store/api/peopleApi';
+import { useGetPersonByIdQuery, peopleApi } from '../../store/api/peopleApi';
+import { useAppDispatch } from '../../store/hooks';
 
 function DetailsPage() {
   const { id } = useParams();
@@ -20,6 +21,20 @@ function DetailsPage() {
 
   const loading = isLoading || isFetching;
   const error = isError ? 'Failed to load character details.' : null;
+  const dispatch = useAppDispatch();
+
+  const handleRefresh = () => {
+    if (!id) return;
+
+    dispatch(
+      peopleApi.util.invalidateTags([
+        {
+          type: 'Person',
+          id,
+        },
+      ])
+    );
+  };
 
   const handleClose = () => {
     const page =
@@ -36,6 +51,14 @@ function DetailsPage() {
         onClick={handleClose}
       >
         Close
+      </button>
+
+      <button
+        className={styles.refreshButton}
+        type="button"
+        onClick={handleRefresh}
+      >
+        Refresh
       </button>
 
       {loading && <Loader />}

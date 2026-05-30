@@ -119,4 +119,26 @@ describe('DetailsPage', () => {
 
     expect(await screen.findByText('Main page')).toBeInTheDocument();
   });
+
+  test('refresh button invalidates cache and refetches character details', async () => {
+    const user = userEvent.setup();
+
+    renderDetailsPage('/details/1?page=2');
+
+    await screen.findByText('Rick Sanchez');
+
+    const fetchMock = vi.mocked(globalThis.fetch);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    expect(getFetchUrl(1)).toContain(
+      'https://rickandmortyapi.com/api/character/1'
+    );
+  });
 });
