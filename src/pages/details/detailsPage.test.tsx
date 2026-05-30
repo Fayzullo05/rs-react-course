@@ -141,4 +141,26 @@ describe('DetailsPage', () => {
       'https://rickandmortyapi.com/api/character/1'
     );
   });
+
+  test('reuses cached character details when opening the same character again', async () => {
+    const user = userEvent.setup();
+
+    renderDetailsPage('/details/1?page=2');
+
+    await screen.findByText('Rick Sanchez');
+
+    const fetchMock = vi.mocked(globalThis.fetch);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /close/i }));
+
+    expect(await screen.findByText('Main page')).toBeInTheDocument();
+
+    renderDetailsPage('/details/1?page=2');
+
+    await screen.findByText('Rick Sanchez');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });

@@ -261,4 +261,33 @@ describe('Layout', () => {
 
     expect(getFetchUrl(1)).toContain('page=2');
   });
+
+  test('reuses cached list data when returning to previously loaded page', async () => {
+    const user = userEvent.setup();
+
+    renderLayout('/?page=1');
+
+    await screen.findByText('Rick Sanchez');
+
+    const fetchMock = vi.mocked(globalThis.fetch);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(getFetchUrl()).toContain('page=1');
+
+    await user.click(screen.getByRole('button', { name: '2' }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    expect(getFetchUrl(1)).toContain('page=2');
+
+    await user.click(screen.getByRole('button', { name: '1' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 });
