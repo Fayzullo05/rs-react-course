@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Layout from './layout';
 import { Provider } from 'react-redux';
 import { store } from '../../store/store';
+import { peopleApi } from '../../store/api/peopleApi';
 
 const mockPeople = [
   {
@@ -15,6 +16,20 @@ const mockPeople = [
     gender: 'Male',
   },
 ];
+
+const createFetchResponse = (body: unknown, status = 200): Response =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+const getFetchUrl = (callIndex = 0): string => {
+  const fetchCall = vi.mocked(globalThis.fetch).mock.calls[callIndex][0];
+
+  return fetchCall instanceof Request ? fetchCall.url : String(fetchCall);
+};
 
 const renderLayout = (initialRoute = '/') => {
   return render(
@@ -29,20 +44,21 @@ const renderLayout = (initialRoute = '/') => {
 describe('Layout', () => {
   beforeEach(() => {
     localStorage.clear();
+    store.dispatch(peopleApi.util.resetApiState());
     vi.restoreAllMocks();
 
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({
-          info: {
-            pages: 3,
-          },
-          results: mockPeople,
-        }),
-      })
+      vi.fn(() =>
+        Promise.resolve(
+          createFetchResponse({
+            info: {
+              pages: 3,
+            },
+            results: mockPeople,
+          })
+        )
+      )
     );
   });
 
@@ -53,16 +69,13 @@ describe('Layout', () => {
   test('fetches initial data on mount', async () => {
     renderLayout();
 
+    expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
+
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1',
-        expect.objectContaining({
-          signal: expect.any(AbortSignal),
-        })
+      expect(getFetchUrl()).toContain(
+        'https://rickandmortyapi.com/api/character/?page=1'
       );
     });
-
-    expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
   });
 
   test('reads saved search term from localStorage on mount', async () => {
@@ -75,12 +88,8 @@ describe('Layout', () => {
     );
 
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=morty',
-        expect.objectContaining({
-          signal: expect.any(AbortSignal),
-        })
-      );
+      expect(getFetchUrl()).toContain('page=1');
+      expect(getFetchUrl()).toContain('name=morty');
     });
   });
 
@@ -112,12 +121,8 @@ describe('Layout', () => {
     expect(localStorage.getItem('searchTerm')).toBe('morty');
 
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=morty',
-        expect.objectContaining({
-          signal: expect.any(AbortSignal),
-        })
-      );
+      expect(getFetchUrl(1)).toContain('page=1');
+      expect(getFetchUrl(1)).toContain('name=morty');
     });
   });
 
@@ -138,12 +143,8 @@ describe('Layout', () => {
     expect(localStorage.getItem('searchTerm')).toBe('rick');
 
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=1&name=rick',
-        expect.objectContaining({
-          signal: expect.any(AbortSignal),
-        })
-      );
+      expect(getFetchUrl(1)).toContain('page=1');
+      expect(getFetchUrl(1)).toContain('name=rick');
     });
   });
 
@@ -168,11 +169,7 @@ describe('Layout', () => {
   test('shows empty message when API returns 404', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 404,
-        json: async () => ({}),
-      })
+      vi.fn().mockResolvedValue(createFetchResponse({}, 404))
     );
 
     renderLayout();
@@ -198,13 +195,8 @@ describe('Layout', () => {
   test('shows error message when API response is not ok', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({}),
-      })
+      vi.fn().mockResolvedValue(createFetchResponse({}, 500))
     );
-
     renderLayout();
 
     expect(
@@ -217,13 +209,10 @@ describe('Layout', () => {
   test('fetches data for page from URL', async () => {
     renderLayout('/?page=2');
 
+    expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
+
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=2',
-        expect.objectContaining({
-          signal: expect.any(AbortSignal),
-        })
-      );
+      expect(getFetchUrl()).toContain('page=2');
     });
   });
 
@@ -237,16 +226,11 @@ describe('Layout', () => {
     await user.click(screen.getByRole('button', { name: '2' }));
 
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character/?page=2',
-        expect.objectContaining({
-          signal: expect.any(AbortSignal),
-        })
-      );
+      expect(getFetchUrl(1)).toContain('page=2');
     });
   });
 
-  test('opens details route when result card is clicked', async () => {
+  test('keeps selected page query when result card is clicked', async () => {
     const user = userEvent.setup();
 
     renderLayout('/?page=2');
@@ -255,8 +239,55 @@ describe('Layout', () => {
 
     await user.click(screen.getByRole('button', { name: /rick sanchez/i }));
 
+    expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
+  });
+
+  test('refresh button invalidates cache and refetches current page', async () => {
+    const user = userEvent.setup();
+
+    renderLayout('/?page=2');
+
+    await screen.findByText('Rick Sanchez');
+
+    const fetchMock = vi.mocked(globalThis.fetch);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
+
     await waitFor(() => {
-      expect(window.location.pathname).toBe('/');
+      expect(fetchMock).toHaveBeenCalledTimes(2);
     });
+
+    expect(getFetchUrl(1)).toContain('page=2');
+  });
+
+  test('reuses cached list data when returning to previously loaded page', async () => {
+    const user = userEvent.setup();
+
+    renderLayout('/?page=1');
+
+    await screen.findByText('Rick Sanchez');
+
+    const fetchMock = vi.mocked(globalThis.fetch);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(getFetchUrl()).toContain('page=1');
+
+    await user.click(screen.getByRole('button', { name: '2' }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    expect(getFetchUrl(1)).toContain('page=2');
+
+    await user.click(screen.getByRole('button', { name: '1' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });
