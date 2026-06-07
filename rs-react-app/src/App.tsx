@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Modal from './components/modal/modal';
 import './App.css';
+import UncontrolledForm from './components/uncontrolledForm/uncontrolledForm';
 
 function App() {
   const [activeModal, setActiveModal] = useState<
@@ -27,10 +28,7 @@ function App() {
 
       {activeModal === 'uncontrolled' && (
         <Modal title="Uncontrolled Form" onClose={closeModal}>
-          <p>Uncontrolled form.</p>
-          <button type="button" onClick={closeModal}>
-            Close
-          </button>
+          <UncontrolledForm onSuccess={closeModal} />
         </Modal>
       )}
 
