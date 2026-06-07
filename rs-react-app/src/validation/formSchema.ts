@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { isValidEmail } from '../utils/email';
-import { validateImageFile } from '../utils/image';
+import { isFileValue, validateImageFile } from '../utils/image';
 
-const genders = ['male', 'female', 'other'] as const;
+const genders = ['male', 'female'] as const;
 
 const startsWithUppercase = (value: string): boolean => {
   const firstCharacter = value.trim().charAt(0);
@@ -54,7 +54,7 @@ export const createFormSchema = (countries: readonly string[]) =>
       }),
 
       image: z
-        .custom<File>((value) => value instanceof File, {
+        .custom<File>(isFileValue, {
           message: 'Image is required.',
         })
         .refine((file) => validateImageFile(file) === null, {
@@ -83,4 +83,5 @@ export const createFormSchema = (countries: readonly string[]) =>
       }
     });
 
-export type FormSchemaValues = z.infer<ReturnType<typeof createFormSchema>>;
+export type FormSchemaInput = z.input<ReturnType<typeof createFormSchema>>;
+export type FormSchemaOutput = z.output<ReturnType<typeof createFormSchema>>;

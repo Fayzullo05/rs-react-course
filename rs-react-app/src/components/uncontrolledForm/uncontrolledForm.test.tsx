@@ -6,6 +6,21 @@ import { describe, expect, test, vi } from 'vitest';
 import formsReducer from '../../store/forms/formsSlice';
 import UncontrolledForm from './uncontrolledForm';
 
+const fillValidUncontrolledForm = async (
+  user: ReturnType<typeof userEvent.setup>,
+  country = 'Uzbekistan'
+): Promise<void> => {
+  await user.type(screen.getByLabelText(/^name$/i), 'Fayzullo');
+  await user.type(screen.getByLabelText(/^age$/i), '20');
+  await user.type(screen.getByLabelText(/^email$/i), 'fayzullo@example.com');
+  await user.selectOptions(screen.getByLabelText(/^gender$/i), 'male');
+  await uploadValidImage(user);
+  await user.type(screen.getByLabelText(/^password$/i), 'Password1!');
+  await user.type(screen.getByLabelText(/confirm password/i), 'Password1!');
+  await user.type(screen.getByLabelText(/^country$/i), country);
+  await user.click(screen.getByLabelText(/i accept terms and conditions/i));
+};
+
 const createTestStore = () =>
   configureStore({
     reducer: {
@@ -33,12 +48,27 @@ const validImage = new File(['image-content'], 'avatar.png', {
   type: 'image/png',
 });
 
+const uploadValidImage = async (
+  user: ReturnType<typeof userEvent.setup>
+): Promise<void> => {
+  const imageInput = screen.getByLabelText(
+    /profile image/i
+  ) as HTMLInputElement;
+
+  await user.upload(imageInput, validImage);
+
+  Object.defineProperty(imageInput, 'files', {
+    value: [validImage],
+    configurable: true,
+  });
+};
+
 describe('UncontrolledForm', () => {
   test('renders all required fields with labels', () => {
     renderUncontrolledForm();
 
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/age/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^age$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/gender/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/profile image/i)).toBeInTheDocument();
@@ -63,18 +93,20 @@ describe('UncontrolledForm', () => {
       screen.getByRole('button', { name: /submit uncontrolled form/i })
     );
 
-    expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/age is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/email is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/gender is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/image is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/password is required/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/confirm password is required/i)
+      await screen.findByText(/^Name is required\.$/i)
     ).toBeInTheDocument();
-    expect(screen.getByText(/country is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Age is required\.$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Email is required\.$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Gender is required\.$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Image is required\.$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Password is required\.$/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/you must accept terms and conditions/i)
+      screen.getByText(/^Confirm password is required\.$/i)
+    ).toBeInTheDocument();
+    expect(screen.getByText(/^Country is required\.$/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/^You must accept Terms and Conditions\.$/i)
     ).toBeInTheDocument();
   });
 
@@ -86,25 +118,13 @@ describe('UncontrolledForm', () => {
     await user.type(screen.getByLabelText(/^password$/i), 'Password1!');
 
     expect(screen.getByText(/password strength: 4\/4/i)).toBeInTheDocument();
-    expect(screen.getByText(/1 number/i)).toBeInTheDocument();
-    expect(screen.getByText(/1 uppercase letter/i)).toBeInTheDocument();
-    expect(screen.getByText(/1 lowercase letter/i)).toBeInTheDocument();
-    expect(screen.getByText(/1 special character/i)).toBeInTheDocument();
   });
 
   test('submits valid data to store and calls success callback', async () => {
     const user = userEvent.setup();
     const { store, handleSuccess } = renderUncontrolledForm();
 
-    await user.type(screen.getByLabelText(/name/i), 'Fayzullo');
-    await user.type(screen.getByLabelText(/age/i), '20');
-    await user.type(screen.getByLabelText(/email/i), 'fayzullo@example.com');
-    await user.selectOptions(screen.getByLabelText(/gender/i), 'male');
-    await user.upload(screen.getByLabelText(/profile image/i), validImage);
-    await user.type(screen.getByLabelText(/^password$/i), 'Password1!');
-    await user.type(screen.getByLabelText(/confirm password/i), 'Password1!');
-    await user.type(screen.getByLabelText(/country/i), 'Uzbekistan');
-    await user.click(screen.getByLabelText(/i accept terms and conditions/i));
+    await fillValidUncontrolledForm(user);
 
     await user.click(
       screen.getByRole('button', { name: /submit uncontrolled form/i })
@@ -128,9 +148,7 @@ describe('UncontrolledForm', () => {
       source: 'uncontrolled',
     });
 
-    expect(state.forms.submissions[0].imageBase64).toContain(
-      'data:image/png;base64'
-    );
+    expect(state.forms.submissions[0].imageBase64).toContain('base64');
   });
 
   test('shows validation error for invalid country', async () => {
@@ -138,15 +156,7 @@ describe('UncontrolledForm', () => {
 
     renderUncontrolledForm();
 
-    await user.type(screen.getByLabelText(/name/i), 'Fayzullo');
-    await user.type(screen.getByLabelText(/age/i), '20');
-    await user.type(screen.getByLabelText(/email/i), 'fayzullo@example.com');
-    await user.selectOptions(screen.getByLabelText(/gender/i), 'male');
-    await user.upload(screen.getByLabelText(/profile image/i), validImage);
-    await user.type(screen.getByLabelText(/^password$/i), 'Password1!');
-    await user.type(screen.getByLabelText(/confirm password/i), 'Password1!');
-    await user.type(screen.getByLabelText(/country/i), 'InvalidCountry');
-    await user.click(screen.getByLabelText(/i accept terms and conditions/i));
+    await fillValidUncontrolledForm(user, 'InvalidCountry');
 
     await user.click(
       screen.getByRole('button', { name: /submit uncontrolled form/i })

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { addSubmission } from '../../store/forms/formsSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createFormSchema } from '../../validation/formSchema';
@@ -39,19 +39,10 @@ const getStringValue = (formData: FormData, key: string): string => {
   return typeof value === 'string' ? value : '';
 };
 
-const getImageFile = (formData: FormData): File | null => {
-  const value = formData.get('image');
-
-  if (value instanceof File && value.size > 0) {
-    return value;
-  }
-
-  return null;
-};
-
 function UncontrolledForm({ onSuccess }: UncontrolledFormProps) {
   const dispatch = useAppDispatch();
   const countries = useAppSelector((state) => state.forms.countries);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [passwordStrength, setPasswordStrength] = useState(
@@ -80,7 +71,7 @@ function UncontrolledForm({ onSuccess }: UncontrolledFormProps) {
       email: getStringValue(formData, 'email'),
       gender: getStringValue(formData, 'gender'),
       termsAccepted: formData.get('termsAccepted') === 'on',
-      image: getImageFile(formData),
+      image: imageInputRef.current?.files?.[0] ?? null,
       password: getStringValue(formData, 'password'),
       confirmPassword: getStringValue(formData, 'confirmPassword'),
       country: getStringValue(formData, 'country'),
@@ -153,7 +144,6 @@ function UncontrolledForm({ onSuccess }: UncontrolledFormProps) {
           </option>
           <option value="male">Male</option>
           <option value="female">Female</option>
-          <option value="other">Other</option>
         </select>
         <p className={styles.error}>{errors.gender ?? '\u00A0'}</p>
       </div>
@@ -161,6 +151,7 @@ function UncontrolledForm({ onSuccess }: UncontrolledFormProps) {
       <div className={styles.field}>
         <label htmlFor="uncontrolled-image">Profile image</label>
         <input
+          ref={imageInputRef}
           id="uncontrolled-image"
           name="image"
           type="file"

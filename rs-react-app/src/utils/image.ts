@@ -1,5 +1,28 @@
 import { ImageValidation } from '../constants/form';
 
+export const isFileValue = (value: unknown): value is File => {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  if (!('name' in value) || !('size' in value) || !('type' in value)) {
+    return false;
+  }
+
+  const fileCandidate = value as {
+    name: unknown;
+    size: unknown;
+    type: unknown;
+  };
+
+  return (
+    typeof fileCandidate.name === 'string' &&
+    typeof fileCandidate.size === 'number' &&
+    fileCandidate.size > 0 &&
+    typeof fileCandidate.type === 'string'
+  );
+};
+
 const getFileExtension = (fileName: string): string =>
   fileName.split('.').pop()?.toLowerCase() ?? '';
 
