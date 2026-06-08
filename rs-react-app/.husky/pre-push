@@ -1,2 +1,3 @@
+cd rs-react-app
 npm run test:run
 npm run build
