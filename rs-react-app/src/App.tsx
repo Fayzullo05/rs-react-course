@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Modal from './components/modal/modal';
 import './App.css';
 import UncontrolledForm from './components/uncontrolledForm/uncontrolledForm';
+import HookForm from './components/hookForm/hookForm';
 
 function App() {
   const [activeModal, setActiveModal] = useState<
@@ -16,7 +17,7 @@ function App() {
     <main>
       <h1>React Forms</h1>
 
-      <div>
+      <div className="buttons">
         <button type="button" onClick={() => setActiveModal('uncontrolled')}>
           Open Uncontrolled Form
         </button>
@@ -34,10 +35,7 @@ function App() {
 
       {activeModal === 'react-hook-form' && (
         <Modal title="React Hook Form" onClose={closeModal}>
-          <p>React Hook Form.</p>
-          <button type="button" onClick={closeModal}>
-            Close
-          </button>
+          <HookForm onSuccess={closeModal} />
         </Modal>
       )}
     </main>
