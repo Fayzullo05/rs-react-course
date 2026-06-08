@@ -3,6 +3,7 @@ import Modal from './components/modal/modal';
 import './App.css';
 import UncontrolledForm from './components/uncontrolledForm/uncontrolledForm';
 import HookForm from './components/hookForm/hookForm';
+import SubmissionsList from './components/submissionsList/submissionsList';
 
 function App() {
   const [activeModal, setActiveModal] = useState<
@@ -26,6 +27,8 @@ function App() {
           Open React Hook Form
         </button>
       </div>
+
+      <SubmissionsList />
 
       {activeModal === 'uncontrolled' && (
         <Modal title="Uncontrolled Form" onClose={closeModal}>
