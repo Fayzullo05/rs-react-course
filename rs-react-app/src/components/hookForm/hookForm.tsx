@@ -18,6 +18,8 @@ type HookFormProps = Readonly<{
 }>;
 
 function HookForm({ onSuccess }: HookFormProps) {
+  const extraSpace = '\u00A0';
+
   const dispatch = useAppDispatch();
   const countries = useAppSelector((state) => state.forms.countries);
 
@@ -94,19 +96,19 @@ function HookForm({ onSuccess }: HookFormProps) {
       <div className={styles.field}>
         <label htmlFor="hook-form-name">Name</label>
         <input id="hook-form-name" type="text" {...register('name')} />
-        <p className={styles.error}>{errors.name?.message ?? '\u00A0'}</p>
+        <p className={styles.error}>{errors.name?.message ?? extraSpace}</p>
       </div>
 
       <div className={styles.field}>
         <label htmlFor="hook-form-age">Age</label>
         <input id="hook-form-age" type="number" {...register('age')} />
-        <p className={styles.error}>{errors.age?.message ?? '\u00A0'}</p>
+        <p className={styles.error}>{errors.age?.message ?? extraSpace}</p>
       </div>
 
       <div className={styles.field}>
         <label htmlFor="hook-form-email">Email</label>
         <input id="hook-form-email" type="email" {...register('email')} />
-        <p className={styles.error}>{errors.email?.message ?? '\u00A0'}</p>
+        <p className={styles.error}>{errors.email?.message ?? extraSpace}</p>
       </div>
 
       <div className={styles.field}>
@@ -118,7 +120,7 @@ function HookForm({ onSuccess }: HookFormProps) {
           <option value="male">Male</option>
           <option value="female">Female</option>
         </select>
-        <p className={styles.error}>{errors.gender?.message ?? '\u00A0'}</p>
+        <p className={styles.error}>{errors.gender?.message ?? extraSpace}</p>
       </div>
 
       <div className={styles.field}>
@@ -129,7 +131,7 @@ function HookForm({ onSuccess }: HookFormProps) {
           accept="image/png,image/jpeg"
           onChange={handleImageChange}
         />
-        <p className={styles.error}>{errors.image?.message ?? '\u00A0'}</p>
+        <p className={styles.error}>{errors.image?.message ?? extraSpace}</p>
       </div>
 
       <div className={styles.field}>
@@ -139,7 +141,7 @@ function HookForm({ onSuccess }: HookFormProps) {
           type="password"
           {...register('password')}
         />
-        <p className={styles.error}>{errors.password?.message ?? '\u00A0'}</p>
+        <p className={styles.error}>{errors.password?.message ?? extraSpace}</p>
       </div>
 
       <PasswordStrengthIndicator strength={passwordStrength} />
@@ -152,7 +154,7 @@ function HookForm({ onSuccess }: HookFormProps) {
           {...register('confirmPassword')}
         />
         <p className={styles.error}>
-          {errors.confirmPassword?.message ?? '\u00A0'}
+          {errors.confirmPassword?.message ?? extraSpace}
         </p>
       </div>
 
@@ -169,7 +171,7 @@ function HookForm({ onSuccess }: HookFormProps) {
             <option key={country} value={country} />
           ))}
         </datalist>
-        <p className={styles.error}>{errors.country?.message ?? '\u00A0'}</p>
+        <p className={styles.error}>{errors.country?.message ?? extraSpace}</p>
       </div>
 
       <div className={styles.checkboxField}>
@@ -181,7 +183,7 @@ function HookForm({ onSuccess }: HookFormProps) {
         <label htmlFor="hook-form-terms">I accept Terms and Conditions</label>
       </div>
       <p className={styles.error}>
-        {errors.termsAccepted?.message ?? '\u00A0'}
+        {errors.termsAccepted?.message ?? extraSpace}
       </p>
 
       <button type="submit" disabled={!isValid || isSubmitting}>
