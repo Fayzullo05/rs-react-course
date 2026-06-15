@@ -1,3 +1,14 @@
 .countryList {
-  padding: 16px;
+  width: 100%;
+}
+
+.row {
+  box-sizing: border-box;
+  padding: 0 16px 16px;
+}
+
+.emptyMessage {
+  padding: 32px 16px;
+  text-align: center;
+  color: #666;
 }
