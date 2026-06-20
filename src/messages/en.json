@@ -1,0 +1,15 @@
+{
+  "Navigation": {
+    "main": "Main",
+    "about": "About"
+  },
+  "HomePage": {
+    "title": "Rick and Morty Search App",
+    "description": "Next.js migration started successfully."
+  },
+  "NotFoundPage": {
+    "title": "404",
+    "description": "Page not found",
+    "returnHome": "Return to main page"
+  }
+}

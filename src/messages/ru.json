@@ -1,0 +1,15 @@
+{
+  "Navigation": {
+    "main": "Главная",
+    "about": "О проекте"
+  },
+  "HomePage": {
+    "title": "Приложение поиска Rick and Morty",
+    "description": "Миграция на Next.js успешно начата."
+  },
+  "NotFoundPage": {
+    "title": "404",
+    "description": "Страница не найдена",
+    "returnHome": "Вернуться на главную"
+  }
+}
