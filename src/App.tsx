@@ -1,9 +1,9 @@
 import { NavLink, Route, Routes } from 'react-router-dom';
 import ErrorBoundary from './components/errorBoundary/errorBoundary';
-import MainPage from './pages/main/mainPage';
-import AboutPage from './pages/about/aboutPage';
-import NotFoundPage from './pages/notFound/notFoundPage';
-import DetailsPage from './pages/details/detailsPage';
+import MainPage from './views/main/mainPage';
+import AboutPage from './views/about/aboutPage';
+import NotFoundPage from './views/notFound/notFoundPage';
+import DetailsPage from './views/details/detailsPage';
 import styles from './App.module.css';
 import ThemeSwitcher from './components/themeSwitcher/themeSwitcher';
 import { RoutePath } from './constants/app';

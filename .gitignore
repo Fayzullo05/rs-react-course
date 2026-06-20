@@ -13,6 +13,8 @@ coverage
 dist-ssr
 *.local
 .env
+.next/
+out/
 
 # Editor directories and files
 .vscode/*

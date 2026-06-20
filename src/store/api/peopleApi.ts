@@ -17,7 +17,7 @@ export type GetPeopleArgs = {
 const DEFAULT_CACHE_TTL_SECONDS = 300;
 
 const cacheTtlSeconds = Number(
-  import.meta.env.VITE_CACHE_TTL ?? DEFAULT_CACHE_TTL_SECONDS
+  process.env.NEXT_PUBLIC_CACHE_TTL ?? DEFAULT_CACHE_TTL_SECONDS
 );
 
 export const peopleApi = createApi({
