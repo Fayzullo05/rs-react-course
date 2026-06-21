@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { QueryParam } from '@/constants/app';
+import styles from './serverPagination.module.css';
 
 type Props = {
   currentPage: number;
@@ -32,20 +33,27 @@ async function ServerPagination({
   }
 
   return (
-    <nav>
+    <nav className={styles.pagination}>
       {currentPage > 1 && (
-        <Link href={createHref(currentPage - 1, searchTerm)}>
+        <Link
+          className={styles.link}
+          href={createHref(currentPage - 1, searchTerm)}
+        >
           {t('previous')}
         </Link>
       )}
 
-      <span>
-        {' '}
-        {currentPage} / {totalPages}{' '}
+      <span className={styles.counter}>
+        {currentPage} / {totalPages}
       </span>
 
       {currentPage < totalPages && (
-        <Link href={createHref(currentPage + 1, searchTerm)}>{t('next')}</Link>
+        <Link
+          className={styles.link}
+          href={createHref(currentPage + 1, searchTerm)}
+        >
+          {t('next')}
+        </Link>
       )}
     </nav>
   );

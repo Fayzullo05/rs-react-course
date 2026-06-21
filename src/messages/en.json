@@ -26,6 +26,20 @@
     "empty": "No results found",
     "previous": "Previous",
     "next": "Next",
-    "detailsPlaceholder": "Select a character to see details"
+    "detailsPlaceholder": "Select a character to see details",
+    "status": "Status",
+    "species": "Species",
+    "gender": "Gender"
+  },
+  "DetailsPanel": {
+    "placeholder": "Select a character to see details",
+    "notFound": "Character not found",
+    "status": "Status",
+    "species": "Species",
+    "gender": "Gender",
+    "type": "Type",
+    "origin": "Origin",
+    "location": "Location",
+    "close": "Close"
   }
 }

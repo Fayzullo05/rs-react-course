@@ -3,6 +3,7 @@
 import { useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { usePathname, useRouter } from '@/i18n/navigation';
+import styles from './languageSwitcher.module.css';
 
 function LanguageSwitcher() {
   const locale = useLocale();
@@ -18,10 +19,11 @@ function LanguageSwitcher() {
   };
 
   return (
-    <div>
-      <span>Language: </span>
+    <div className={styles.switcher}>
+      <span className={styles.label}>Language:</span>
 
       <button
+        className={locale === 'en' ? styles.active : styles.button}
         type="button"
         disabled={locale === 'en'}
         onClick={() => handleLocaleChange('en')}
@@ -30,6 +32,7 @@ function LanguageSwitcher() {
       </button>
 
       <button
+        className={locale === 'ru' ? styles.active : styles.button}
         type="button"
         disabled={locale === 'ru'}
         onClick={() => handleLocaleChange('ru')}

@@ -1,0 +1,31 @@
+.page {
+  width: min(900px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.card {
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+}
+
+.title {
+  margin: 0 0 20px;
+  font-size: 38px;
+}
+
+.text {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--primary);
+  font-weight: 700;
+}

@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import styles from './aboutPage.module.css';
 
 type Props = {
   params: Promise<{
@@ -19,18 +20,21 @@ export default async function AboutPage({ params }: Props) {
   });
 
   return (
-    <main>
-      <h1>{t('title')}</h1>
-      <p>{t('author')}</p>
-      <p>{t('description')}</p>
+    <main className={styles.page}>
+      <section className={styles.card}>
+        <h1 className={styles.title}>{t('title')}</h1>
+        <p className={styles.text}>{t('author')}</p>
+        <p className={styles.text}>{t('description')}</p>
 
-      <a
-        href="https://rs.school/courses/reactjs"
-        target="_blank"
-        rel="noreferrer"
-      >
-        {t('courseLink')}
-      </a>
+        <a
+          className={styles.link}
+          href="https://rs.school/courses/reactjs"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {t('courseLink')}
+        </a>
+      </section>
     </main>
   );
 }

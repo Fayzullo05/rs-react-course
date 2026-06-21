@@ -1,9 +1,11 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server';
-import ServerSearchForm from '@/components/serverSearchForm/serverSearchForm';
-import ServerResultsList from '@/components/serverResultsList/serverResultsList';
+import { setRequestLocale } from 'next-intl/server';
+import ServerDetailsPanel from '@/components/serverDetailsPanel/serverDetailsPanel';
 import ServerPagination from '@/components/serverPagination/serverPagination';
+import ServerResultsList from '@/components/serverResultsList/serverResultsList';
+import ServerSearchForm from '@/components/serverSearchForm/serverSearchForm';
 import { PaginationValue, QueryParam } from '@/constants/app';
 import { getPeople } from '@/services/people';
+import styles from './homePage.module.css';
 
 type Props = {
   params: Promise<{
@@ -12,6 +14,7 @@ type Props = {
   searchParams: Promise<{
     page?: string;
     name?: string;
+    selectedId?: string;
   }>;
 };
 
@@ -31,11 +34,6 @@ export default async function HomePage({ params, searchParams }: Props) {
 
   setRequestLocale(locale);
 
-  const t = await getTranslations({
-    locale,
-    namespace: 'SearchPage',
-  });
-
   const currentPage = normalizePage(query.page);
   const searchTerm = query[QueryParam.name] ?? '';
 
@@ -45,11 +43,11 @@ export default async function HomePage({ params, searchParams }: Props) {
   });
 
   return (
-    <main>
+    <main className={styles.page}>
       <ServerSearchForm searchTerm={searchTerm} />
 
-      <div>
-        <div>
+      <div className={styles.content}>
+        <div className={styles.resultsColumn}>
           <ServerResultsList
             results={data.results}
             currentPage={currentPage}
@@ -63,9 +61,13 @@ export default async function HomePage({ params, searchParams }: Props) {
           />
         </div>
 
-        <aside>
-          <p>{t('detailsPlaceholder')}</p>
-        </aside>
+        <div className={styles.detailsColumn}>
+          <ServerDetailsPanel
+            selectedId={query.selectedId}
+            currentPage={currentPage}
+            searchTerm={searchTerm}
+          />
+        </div>
       </div>
     </main>
   );
