@@ -17,5 +17,15 @@
     "title": "404",
     "description": "Page not found",
     "returnHome": "Return to main page"
+  },
+  "SearchPage": {
+    "searchTitle": "Search",
+    "searchPlaceholder": "Enter search term...",
+    "searchButton": "Search",
+    "resultsTitle": "Results",
+    "empty": "No results found",
+    "previous": "Previous",
+    "next": "Next",
+    "detailsPlaceholder": "Select a character to see details"
   }
 }

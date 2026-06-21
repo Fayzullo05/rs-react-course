@@ -17,5 +17,15 @@
     "title": "404",
     "description": "Страница не найдена",
     "returnHome": "Вернуться на главную"
+  },
+  "SearchPage": {
+    "searchTitle": "Поиск",
+    "searchPlaceholder": "Введите поисковый запрос...",
+    "searchButton": "Искать",
+    "resultsTitle": "Результаты",
+    "empty": "Ничего не найдено",
+    "previous": "Назад",
+    "next": "Далее",
+    "detailsPlaceholder": "Выберите персонажа, чтобы увидеть детали"
   }
 }
