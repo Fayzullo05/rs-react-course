@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ThemeContext, type Theme } from './themeContext';
 

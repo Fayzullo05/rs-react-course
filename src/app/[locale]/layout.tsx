@@ -3,7 +3,8 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import { Link } from '@/i18n/navigation';
+import Navigation from '@/components/navigation/navigation';
+import { ThemeProvider } from '@/context/theme/themeProvider';
 
 type Props = {
   children: ReactNode;
@@ -29,12 +30,10 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale}>
       <body>
         <NextIntlClientProvider>
-          <nav>
-            <Link href="/">Main</Link>
-            <Link href="/about">About</Link>
-          </nav>
-
-          {children}
+          <ThemeProvider>
+            <Navigation />
+            {children}
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
