@@ -3,6 +3,7 @@ import { Link } from '@/i18n/navigation';
 import type { Person } from '@/types/person';
 import { QueryParam } from '@/constants/app';
 import styles from './serverResultsList.module.css';
+import SelectCharacterButton from '../selection/selectCharacterButton';
 
 type Props = {
   results: Person[];
@@ -40,6 +41,7 @@ async function ServerResultsList({ results, currentPage, searchTerm }: Props) {
         <div className={styles.list}>
           {results.map((person) => (
             <article key={person.id} className={styles.card}>
+              <SelectCharacterButton personId={person.id} />
               <h3 className={styles.name}>
                 <Link
                   href={createDetailsHref(person.id, currentPage, searchTerm)}

@@ -6,6 +6,8 @@ import ServerSearchForm from '@/components/serverSearchForm/serverSearchForm';
 import { PaginationValue, QueryParam } from '@/constants/app';
 import { getPeople } from '@/services/people';
 import styles from './homePage.module.css';
+import SelectedItemsFlyout from '@/components/selection/selectedItemsFlyout';
+import { SelectionProvider } from '@/components/selection/selectionContext';
 
 type Props = {
   params: Promise<{
@@ -43,32 +45,36 @@ export default async function HomePage({ params, searchParams }: Props) {
   });
 
   return (
-    <main className={styles.page}>
-      <ServerSearchForm searchTerm={searchTerm} />
+    <SelectionProvider>
+      <main className={styles.page}>
+        <ServerSearchForm searchTerm={searchTerm} />
 
-      <div className={styles.content}>
-        <div className={styles.resultsColumn}>
-          <ServerResultsList
-            results={data.results}
-            currentPage={currentPage}
-            searchTerm={searchTerm}
-          />
+        <div className={styles.content}>
+          <div className={styles.resultsColumn}>
+            <ServerResultsList
+              results={data.results}
+              currentPage={currentPage}
+              searchTerm={searchTerm}
+            />
 
-          <ServerPagination
-            currentPage={currentPage}
-            totalPages={data.info.pages}
-            searchTerm={searchTerm}
-          />
+            <ServerPagination
+              currentPage={currentPage}
+              totalPages={data.info.pages}
+              searchTerm={searchTerm}
+            />
+          </div>
+
+          <div className={styles.detailsColumn}>
+            <ServerDetailsPanel
+              selectedId={query.selectedId}
+              currentPage={currentPage}
+              searchTerm={searchTerm}
+            />
+          </div>
         </div>
+      </main>
 
-        <div className={styles.detailsColumn}>
-          <ServerDetailsPanel
-            selectedId={query.selectedId}
-            currentPage={currentPage}
-            searchTerm={searchTerm}
-          />
-        </div>
-      </div>
-    </main>
+      <SelectedItemsFlyout />
+    </SelectionProvider>
   );
 }

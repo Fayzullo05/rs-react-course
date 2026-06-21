@@ -1,0 +1,9 @@
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  cursor: pointer;
+}
