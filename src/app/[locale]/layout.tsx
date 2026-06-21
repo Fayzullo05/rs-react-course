@@ -27,15 +27,11 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
-      <body>
-        <NextIntlClientProvider>
-          <ThemeProvider>
-            <Navigation />
-            {children}
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider>
+      <ThemeProvider>
+        <Navigation />
+        {children}
+      </ThemeProvider>
+    </NextIntlClientProvider>
   );
 }

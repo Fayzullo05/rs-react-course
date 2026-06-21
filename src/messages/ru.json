@@ -7,6 +7,12 @@
     "title": "Приложение поиска Rick and Morty",
     "description": "Миграция на Next.js успешно начата."
   },
+  "AboutPage": {
+    "title": "О проекте",
+    "author": "Автор: Fayzullaxon Sharipxanov",
+    "description": "Это приложение было создано как задание для курса RS School React",
+    "courseLink": "Курс RS School React"
+  },
   "NotFoundPage": {
     "title": "404",
     "description": "Страница не найдена",

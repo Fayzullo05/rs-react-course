@@ -7,6 +7,12 @@
     "title": "Rick and Morty Search App",
     "description": "Next.js migration started successfully."
   },
+  "AboutPage": {
+    "title": "About",
+    "author": "Author: Fayzullaxon Sharipxanov",
+    "description": "This application was created as a task for the RS School React course",
+    "courseLink": "RS School React course"
+  },
   "NotFoundPage": {
     "title": "404",
     "description": "Page not found",
