@@ -47,7 +47,7 @@ export default async function HomePage({ params, searchParams }: Props) {
   return (
     <SelectionProvider>
       <main className={styles.page}>
-        <ServerSearchForm searchTerm={searchTerm} />
+        <ServerSearchForm searchTerm={searchTerm} locale={locale} />
 
         <div className={styles.content}>
           <div className={styles.resultsColumn}>
