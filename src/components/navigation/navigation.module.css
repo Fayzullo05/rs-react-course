@@ -1,0 +1,31 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 36px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel-bg) 92%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.navLink {
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.navLink:hover {
+  background: rgba(91, 92, 246, 0.12);
+}
+
+@media (max-width: 700px) {
+  .nav {
+    flex-wrap: wrap;
+    padding: 14px 18px;
+  }
+}

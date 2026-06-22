@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-left: auto;
 }
 
 .label {
@@ -11,19 +12,21 @@
 
 .button,
 .active {
-  padding: 8px 14px;
-  border: 1px solid var(--primary);
+  min-width: 38px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: transparent;
-  color: var(--primary);
+  background: var(--panel-bg);
+  color: var(--text);
   cursor: pointer;
 }
 
 .active {
+  border-color: var(--primary);
   background: var(--primary);
   color: white;
 }
 
 .button:hover {
-  background: rgba(91, 92, 246, 0.12);
+  border-color: var(--primary);
 }

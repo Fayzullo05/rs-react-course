@@ -1,0 +1,41 @@
+.page {
+  width: min(760px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 72px 0;
+}
+
+.card {
+  padding: 40px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 12px;
+  color: var(--primary);
+  font-size: 72px;
+  line-height: 1;
+}
+
+.text {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 20px;
+}
+
+.link {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.link:hover {
+  background: var(--primary-dark);
+}

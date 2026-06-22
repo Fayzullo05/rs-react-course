@@ -1,3 +1,4 @@
+'use client';
 import { useTheme } from '../../context/theme/useTheme';
 import styles from './themeSwitcher.module.css';
 
